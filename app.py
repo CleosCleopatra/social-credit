@@ -145,7 +145,7 @@ def show_login():
 
     document.getElementById(
         "login-button"
-    ).onclick = lambda event: login()
+    ).onclick = lambda event: asyncio.create_task(login())
 
     document.getElementById(
         "admin-button"
