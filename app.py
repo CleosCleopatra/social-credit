@@ -151,19 +151,13 @@ def show_login():
         "admin-button"
     ).onclick = lambda event: show_admin_login()
 
-
 async def login():
-
-    citizenship_id = get_value(
-        "citizenship-input"
-    ).strip()
+    citizenship_id = get_value("citizenship-input").strip()
 
     if not citizenship_id:
-
         document.getElementById(
             "login-error"
         ).innerText = "Enter your citizenship ID."
-
         return
 
     set_content(
@@ -173,13 +167,11 @@ async def login():
     result = await api(
         "member",
         {
-            "citizenship_id":
-                citizenship_id
+            "citizenship_id": citizenship_id
         }
     )
 
     if not result.get("success"):
-
         show_login()
 
         document.getElementById(
@@ -192,7 +184,6 @@ async def login():
         return
 
     save_id(citizenship_id)
-
     render_member(result)
 
 
