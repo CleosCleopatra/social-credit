@@ -34,6 +34,46 @@ def get_value(element_id):
 # ============================================================
 
 async def api(action, params=None):
+    if params is None:
+        params = {}
+
+    params["action"] = action
+
+    query = "&".join(
+        f"{key}={window.encodeURIComponent(str(value))}"
+        for key, value in params.items()
+    )
+
+    url = f"{API_URL}?{query}"
+
+    print("API REQUEST:", url)
+
+    response = await fetch(url)
+
+    print("API STATUS:", response.status)
+    print("API OK:", response.ok)
+
+    text = await response.text()
+
+    print("API RAW RESPONSE:")
+    print(repr(text))
+
+    if not text.strip():
+        raise Exception(
+            f"Google Apps Script returned an empty response. "
+            f"HTTP status: {response.status}"
+        )
+
+    try:
+        return json.loads(text)
+
+    except json.JSONDecodeError:
+        raise Exception(
+            "Google Apps Script did not return valid JSON.\n\n"
+            f"HTTP status: {response.status}\n"
+            f"Response: {text[:1000]}"
+        )
+    """
     if params is None: 
         params = {}
 
@@ -61,30 +101,6 @@ async def api(action, params=None):
 
     print("API STATUS:", response.status)
     print("API RESPONSE", text)
-
-
-    """
-    if params is None:
-        params = {}
-
-    params["action"] = action
-
-    query = "&".join(
-        f"{key}={window.encodeURIComponent(str(value))}"
-        for key, value in params.items()
-    )
-
-    url = f"{API_URL}?{query}"
-
-    response = await fetch(url)
-
-
-
-    text = await response.text()
-
-    print("API STATUS:", response.status)
-    print("API RESPONSE:", text)
-
     """
 
     return json.loads(text)
@@ -607,28 +623,6 @@ def render_admin(people, password):
             <div
                 id="intervals"
             >
-
-                <div class="interval-row">
-
-                    <input
-                        id="min-0"
-                        value="0"
-                        type="number"
-                    >
-
-                    <input
-                        id="max-0"
-                        value="99"
-                        type="number"
-                    >
-
-                    <input
-                        id="count-0"
-                        value="0"
-                        type="number"
-                    >
-
-                </div>
 
 
                 <div class="interval-row">
