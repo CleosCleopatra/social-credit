@@ -774,32 +774,17 @@ def calculate_current_distribution(people):
 
         {
             "min": 0,
-            "max": 99
+            "max": 1000
         },
 
         {
-            "min": 100,
-            "max": 199
+            "min": 1001,
+            "max": 2000
         },
 
         {
-            "min": 200,
-            "max": 299
-        },
-
-        {
-            "min": 300,
-            "max": 399
-        },
-
-        {
-            "min": 400,
-            "max": 499
-        },
-
-        {
-            "min": 500,
-            "max": 9999
+            "min": 2001,
+            "max": 3000
         }
 
     ]
