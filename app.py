@@ -2,6 +2,8 @@ from pyscript import document
 from js import window, fetch
 import json
 import asyncio
+import sys
+sys.path.append(".")
 from config import API_URL
 
 # =========================== =================================
