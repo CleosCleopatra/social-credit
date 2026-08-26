@@ -34,7 +34,36 @@ def get_value(element_id):
 # ============================================================
 
 async def api(action, params=None):
+    if params is None: 
+        params = {}
 
+    params["action"] = action
+
+    query = "&".join(
+        f"{key}={window.encodeURIComponent(str(value))}"
+        for key, value in params.items()
+    )
+
+    url = f"{API_URL}?{query}"
+
+    print("Starting API request: ", url)
+    start = time.time()
+
+    response = await fetch(url)
+
+    print(
+        "FETCH FINISHED AFTER: ",
+        round(time.time() - start, 2),
+        "SECONDS"
+    )
+
+    text = await response.text()
+
+    print("API STATUS:", response.status)
+    print("API RESPONSE", text)
+
+
+    """
     if params is None:
         params = {}
 
@@ -55,6 +84,8 @@ async def api(action, params=None):
 
     print("API STATUS:", response.status)
     print("API RESPONSE:", text)
+
+    """
 
     return json.loads(text)
 
