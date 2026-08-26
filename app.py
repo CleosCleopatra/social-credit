@@ -634,19 +634,19 @@ def render_admin(people, password):
                 <div class="interval-row">
 
                     <input
-                        id="min-1"
-                        value="100"
+                        id="bad_min"
+                        value="0"
                         type="number"
                     >
 
                     <input
-                        id="max-1"
-                        value="199"
+                        id="bad_max"
+                        value="1000"
                         type="number"
                     >
 
                     <input
-                        id="count-1"
+                        id="count-bad"
                         value="0"
                         type="number"
                     >
@@ -657,19 +657,19 @@ def render_admin(people, password):
                 <div class="interval-row">
 
                     <input
-                        id="min-2"
-                        value="200"
+                        id="min-mid"
+                        value="1001"
                         type="number"
                     >
 
                     <input
-                        id="max-2"
-                        value="299"
+                        id="max-mid"
+                        value="2000"
                         type="number"
                     >
 
                     <input
-                        id="count-2"
+                        id="count-mid"
                         value="0"
                         type="number"
                     >
@@ -680,65 +680,19 @@ def render_admin(people, password):
                 <div class="interval-row">
 
                     <input
-                        id="min-3"
-                        value="300"
+                        id="min-high"
+                        value="2001"
                         type="number"
                     >
 
                     <input
-                        id="max-3"
-                        value="399"
+                        id="max-high"
+                        value="3000"
                         type="number"
                     >
 
                     <input
-                        id="count-3"
-                        value="0"
-                        type="number"
-                    >
-
-                </div>
-
-
-                <div class="interval-row">
-
-                    <input
-                        id="min-4"
-                        value="400"
-                        type="number"
-                    >
-
-                    <input
-                        id="max-4"
-                        value="499"
-                        type="number"
-                    >
-
-                    <input
-                        id="count-4"
-                        value="0"
-                        type="number"
-                    >
-
-                </div>
-
-
-                <div class="interval-row">
-
-                    <input
-                        id="min-5"
-                        value="500"
-                        type="number"
-                    >
-
-                    <input
-                        id="max-5"
-                        value="9999"
-                        type="number"
-                    >
-
-                    <input
-                        id="count-5"
+                        id="count-high"
                         value="0"
                         type="number"
                     >
