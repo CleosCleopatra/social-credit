@@ -980,8 +980,7 @@ async def start_adjustment(password):
                 == target["max"]
             ):
 
-                current_count =
-                    interval["count"]
+                current_count = interval["count"]
 
 
         difference += abs(
