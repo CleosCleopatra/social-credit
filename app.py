@@ -49,7 +49,12 @@ async def api(action, params=None):
 
     response = await fetch(url)
 
+
+
     text = await response.text()
+
+    print("API STATUS:", response.status)
+    print("API RESPONSE:", text)
 
     return json.loads(text)
 
