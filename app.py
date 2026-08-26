@@ -2,19 +2,11 @@ from pyscript import document
 from js import window, fetch
 import json
 import asyncio
-
+from config import API_URL
 
 # ============================================================
 # CONFIGURATION
 # ============================================================
-
-# PUT YOUR GOOGLE APPS SCRIPT URL HERE
-
-API_URL = (
-    "https://script.google.com/macros/s/"
-    "PUT_YOUR_SCRIPT_ID_HERE"
-    "/exec"
-)
 
 
 # ============================================================
