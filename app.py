@@ -959,10 +959,7 @@ async def start_adjustment(password):
     # is approximately the number
     # of people that need moving.
 
-    current =
-        calculate_current_distribution(
-            people
-        )
+    current =calculate_current_distribution(people)
 
 
     difference = 0
