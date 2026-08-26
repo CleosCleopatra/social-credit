@@ -1,4 +1,4 @@
-from pyscript import document
+"""from pyscript import document
 from js import window, fetch
 import json
 import asyncio
@@ -73,7 +73,7 @@ async def api(action, params=None):
             f"HTTP status: {response.status}\n"
             f"Response: {text[:1000]}"
         )
-    """
+    ""
     if params is None: 
         params = {}
 
@@ -101,7 +101,7 @@ async def api(action, params=None):
 
     print("API STATUS:", response.status)
     print("API RESPONSE", text)
-    """
+    ""
 
     return json.loads(text)
 
@@ -155,7 +155,7 @@ async def start():
 
 def show_login():
 
-    set_content("""
+    set_content(""
 
         <div class="card">
 
@@ -193,7 +193,7 @@ def show_login():
 
         </div>
 
-    """)
+    "")
 
     document.getElementById(
         "login-button"
@@ -282,11 +282,11 @@ def render_member(data):
 
     if not events:
 
-        event_html = """
+        event_html = ""
             <p class="small">
                 No reports yet.
             </p>
-        """
+        ""
 
     else:
 
@@ -312,7 +312,7 @@ def render_member(data):
             )
 
 
-            event_html += f"""
+            event_html += f""
 
                 <div class="event">
 
@@ -334,10 +334,10 @@ def render_member(data):
 
                 </div>
 
-            """
+            ""
 
 
-    set_content(f"""
+    set_content(f""
 
         <div class="card">
 
@@ -388,7 +388,7 @@ def render_member(data):
 
         </div>
 
-    """)
+    "")
 
 
     document.getElementById(
@@ -416,7 +416,7 @@ def change_id():
 
 def show_admin_login():
 
-    set_content("""
+    set_content(""
 
         <div class="card">
 
@@ -449,7 +449,7 @@ def show_admin_login():
 
         </div>
 
-    """)
+    "")
 
 
     document.getElementById(
@@ -486,6 +486,10 @@ async def admin_login():
         ).innerText = "Incorrect password."
 
         return
+
+    set_content(
+        "<div class='card'>Loading...</div>"
+    )
 
 
     await show_admin(password)
@@ -545,7 +549,7 @@ def render_admin(people, password):
 
     for interval in distribution:
 
-        rows += f"""
+        rows += f""
 
             <tr>
 
@@ -561,10 +565,10 @@ def render_admin(people, password):
 
             </tr>
 
-        """
+        ""
 
 
-    set_content(f"""
+    set_content(f""
 
         <div class="card">
 
@@ -743,7 +747,7 @@ def render_admin(people, password):
 
         </div>
 
-    """)
+    "")
 
 
     document.getElementById(
@@ -1047,3 +1051,4 @@ asyncio.create_task(
 
           
     
+"""
