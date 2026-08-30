@@ -553,11 +553,23 @@ async function reportScreen(){
 
     try {
         // Fetch list of events that can be reported
-        const events_list_return = await api(
+        const result = await api(
             "events_list",  // Get available report types/reasons
             {}
         );
-        events_list = events_list_return.events
+
+        // Check if the request was successful
+        if (!result.success) {
+            throw new Error(result.error || "Failed to load events list");
+        }
+
+        // Extract the events array from the response
+        const events_list = result.events || [];
+
+        // Check if events list is actually an array
+        if (!Array.isArray(events_list)) {
+            throw new Error("Events list is not an array: " + JSON.stringify(result));
+        }
 
         const eventsHTML = events_list.map(event => {
             return `
