@@ -428,8 +428,8 @@ function renderMember(data) {
                         <!-- Show the points with appropriate color (green/red) -->
                         <span class="${
                             positive
-                                ? "positive"   // Green color for good points -->
-                                : "negative"   // Red color for bad points -->
+                                ? "positive"   // Green color for good points 
+                                : "negative"   // Red color for bad points 
                         }">
 
                             ${sign}${event.points}  <!-- Show "+" or nothing, then the number -->
@@ -472,7 +472,7 @@ function renderMember(data) {
 
                 Citizenship ID:
                 ${escapeHTML(
-                    person.citizenship_id  <!-- The unique ID -->
+                    person.citizenship_id  //<!-- The unique ID -->
                 )}
 
             </div>
@@ -550,181 +550,229 @@ function renderMember(data) {
 
 
 
+// reportScreen() - Shows the screen to report another member's behavior
 async function reportScreen(){
 
-    const members_list = await api(
-        "members_list",  // The action we want: get member info
-                {
-                }
-            );
-    
-    
-    const events_list = await api(
-        "events_list",
-        {}
-    );
+    try {
+        // Fetch list of events that can be reported
+        const events_list = await api(
+            "events_list",  // Get available report types/reasons
+            {}
+        );
 
-    const eventsHTML = events_list.map(event => {
-        return `
-            <a href="#" data-event="${event}">
-            ${event}
-            </a>
-        `;
-    }).join("");
+        const eventsHTML = events_list.map(event => {
+            return `
+                <a href="#" data-event="${event}">
+                    ${event}
+                </a>
+            `;
+        }).join("");
 
-    // Create and display the complete member profile HTML
-    setContent(`
+        // Create and display the reporting form
+        setContent(`
 
-        <!-- Card 2: List of events -->
-        <div class="card">
+            <!-- Reporting Card -->
+            <div class="card">
 
-            <h2>
-                Reporting  <!-- Title for the events section -->
-            </h2>
+                <h2>Report Member Behavior</h2>
 
-            <!-- Text input field where user types their ID -->
-            <h1>
-                Person you want to report
-            </h1>
-            <input
-                id="report-person-input"
-                placeholder="Citizenship ID/Name"
-            >
+                <p>
+                    Enter the citizenship ID or name of the person you want to report.
+                </p>
 
-            <style>
+                <!-- Input for person to report -->
+                <input
+                    id="report-person-input"
+                    placeholder="Citizenship ID or Name"
+                >
+
+                <!-- Dropdown to select the reason/event -->
+                <div class="dropdown" style="margin-top: 20px;">
+                    <button id="dropdown-button" class="dropbtn">
+                        Select reason...
+                    </button>
+                    <div id="myDropdown" class="dropdown-content">
+                        <input 
+                            type="text" 
+                            placeholder="Search.." 
+                            id="myInput"
+                        >
+                        ${eventsHTML}
+                    </div>
+                </div>
+
+                <!-- Error/status message -->
+                <p id="report-error" class="error" style="margin-top: 20px;"></p>
+
+                <!-- Submit button -->
+                <button id="login-report-button" style="margin-top: 20px;">
+                    SUBMIT REPORT
+                </button>
+
+                <!-- Back button -->
+                <button id="report-back-button" style="margin-top: 10px;">
+                    BACK
+                </button>
+
+            </div>
+        `);
+
+        // Add CSS for dropdown styling
+        const style = document.createElement('style');
+        style.textContent = `
             .dropbtn {
                 background-color: #04AA6D;
                 color: white;
-                padding: 16px;
+                padding: 12px 16px;
                 font-size: 16px;
                 border: none;
                 cursor: pointer;
+                width: 100%;
             }
-
             .dropbtn:hover, .dropbtn:focus {
                 background-color: #3e8e41;
             }
-
             #myInput {
                 box-sizing: border-box;
-                background-image: url('searchicon.png');
-                background-position: 14px 12px;
-                background-repeat: no-repeat;
                 font-size: 16px;
-                padding: 14px 20px 12px 45px;
+                padding: 12px 16px;
                 border: none;
                 border-bottom: 1px solid #ddd;
+                width: 100%;
             }
-
-            #myInput:focus {outline: 3px solid #ddd;}
-
+            #myInput:focus {outline: 3px solid #04AA6D;}
             .dropdown {
                 position: relative;
-                display: inline-block;
+                display: block;
+                width: 100%;
             }
-
             .dropdown-content {
                 display: none;
                 position: absolute;
                 background-color: #f6f6f6;
-                min-width: 230px;
+                width: 100%;
                 overflow: auto;
                 border: 1px solid #ddd;
                 z-index: 1;
+                max-height: 200px;
+                overflow-y: auto;
             }
-
             .dropdown-content a {
                 color: black;
                 padding: 12px 16px;
                 text-decoration: none;
                 display: block;
             }
-
-            .dropdown a:hover {background-color: #ddd;}
-
+            .dropdown-content a:hover {background-color: #ddd;}
             .show {display: block;}
-            </style>
-            </head>
-            <body style="background-color:white;">
+        `;
+        document.head.appendChild(style);
 
-            <h2>Search/Filter Dropdown</h2>
-            <p>Click on the button to open the dropdown menu, and use the input field to search for a specific dropdown link.</p>
+        // Variable to store selected event
+        let selectedEvent = null;
 
-            <div class="dropdown">
-                <button onclick="myFunction()" class="dropbtn">
-                    Dropdown
-                </button>
-                <div id="myDropdown" class="dropdown-content">
-                    <input 
-                        type="text" 
-                        placeholder="Search.." 
-                        id="myInput" 
-                        onkeyup="filterFunction()"
-                    >
-                    ${eventsHTML}
-                </div>
-            </div>
+        // Get the dropdown button and event links
+        const dropdownBtn = document.getElementById("dropdown-button");
+        const dropdownContent = document.getElementById("myDropdown");
+        const myInput = document.getElementById("myInput");
+        const eventLinks = dropdownContent.getElementsByTagName("a");
 
-            <script>
-            /* When the user clicks on the button,
-            toggle between hiding and showing the dropdown content */
-            function myFunction() {
-                document.getElementById("myDropdown").classList.toggle("show");
-            }
+        // Toggle dropdown when button is clicked
+        dropdownBtn.onclick = function(e) {
+            e.preventDefault();  // Prevent default link behavior
+            dropdownContent.classList.toggle("show");
+        };
 
-            function filterFunction() {
-                const input = document.getElementById("myInput");
-                const filter = input.value.toUpperCase();
-                const div = document.getElementById("myDropdown");
-                const a = div.getElementsByTagName("a");
-                for (let i = 0; i < a.length; i++) {
-                    txtValue = a[i].textContent || a[i].innerText;
-                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
-                        a[i].style.display = "";
-                    } else {
-                        a[i].style.display = "none";
-                    }
+        // Filter dropdown items as user types
+        myInput.onkeyup = function() {
+            const filter = this.value.toUpperCase();
+            for (let i = 0; i < eventLinks.length; i++) {
+                const text = eventLinks[i].textContent || eventLinks[i].innerText;
+                if (text.toUpperCase().indexOf(filter) > -1) {
+                    eventLinks[i].style.display = "";
+                } else {
+                    eventLinks[i].style.display = "none";
                 }
             }
-
-            
-
-
-            <!-- Button to submit the login form -->
-            <button id="login-report-button">
-                ENTER   
-            </button>
-
-        </div>
-    `);
-
-    let selectedEvent = null;
-
-    const eventLinks = 
-        document
-            .getElementById("myDropdown")
-            .getElementsByTagName("a");
-    
-    for (let i = 0; i < eventLinks.length; i++){
-        eventLinks[i].onclick = function() {
-            selectedEvent =
-                this.dataset.event;
-            
-            document
-                .querySelector(".dropbtn")
-                .innerText = selectedEvent;
         };
+
+        // Handle clicking on an event in the dropdown
+        for (let i = 0; i < eventLinks.length; i++) {
+            eventLinks[i].onclick = function(e) {
+                e.preventDefault();  // Prevent default link behavior
+                selectedEvent = this.dataset.event;  // Store selected event
+                dropdownBtn.innerText = selectedEvent;  // Show selected value
+                dropdownContent.classList.remove("show");  // Close dropdown
+            };
+        }
+
+        // Handle submit button
+        document.getElementById("login-report-button").onclick = async function() {
+            const person = document.getElementById("report-person-input").value.trim();
+            const errorEl = document.getElementById("report-error");
+
+            // Validate inputs
+            if (!person) {
+                errorEl.innerText = "Please enter a citizenship ID or name.";
+                return;
+            }
+            if (!selectedEvent) {
+                errorEl.innerText = "Please select a reason for the report.";
+                return;
+            }
+
+            // Show loading message
+            errorEl.innerText = "Submitting report...";
+
+            // Submit the report
+            await report(person, selectedEvent);
+        };
+
+        // Handle back button
+        document.getElementById("report-back-button").onclick = function() {
+            showLogin();  // Return to main screen
+        };
+
+    } catch (error) {
+        setContent(`
+            <div class="card error">
+                Error loading report screen: ${escapeHTML(error.message)}
+            </div>
+        `);
     }
-    document
-        .getElementById("login-report-button")
-        .onclick = function() {
-            report(
-                document
-                    .getElementById("report-person-input")
-                    .value,
-                selectedEvent
-            );
-        };
+}
+
+// report() - Sends a report to the server
+// Parameters:
+//   - person: Citizenship ID or name of person being reported
+//   - event: The reason/type of report
+async function report(person, event) {
+    try {
+        // Send the report to the server
+        const result = await api(
+            "report",  // Tell server to process a report
+            {
+                person: person,  // Who to report
+                event: event     // Why they're being reported
+            }
+        );
+
+        // Check if report was successful
+        if (!result.success) {
+            // Show error message to user
+            document.getElementById("report-error").innerText = result.error;
+            return;
+        }
+
+        // Success! Show confirmation and return to login
+        alert("Report submitted successfully");
+        showLogin();
+
+    } catch (error) {
+        // Network or server error
+        document.getElementById("report-error").innerText = 
+            "Error submitting report: " + error.message;
+    }
 }
 /* ============================================================
    ADMIN LOGIN - Admin authentication screen and password validation
