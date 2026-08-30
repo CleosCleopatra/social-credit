@@ -553,10 +553,11 @@ async function reportScreen(){
 
     try {
         // Fetch list of events that can be reported
-        const events_list = await api(
+        const events_list_return = await api(
             "events_list",  // Get available report types/reasons
             {}
         );
+        events_list = events_list_return.events
 
         const eventsHTML = events_list.map(event => {
             return `
