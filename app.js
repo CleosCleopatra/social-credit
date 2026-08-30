@@ -728,19 +728,30 @@ async function reportScreen(){
         personDropdownBtn.onclick = function(e) {
             e.preventDefault();
             personDropdownContent.classList.toggle("show");
+            personInput.focus();  // Focus on search input
         };
 
-        // Filter person dropdown items as user types
+        // Keep dropdown open while typing and filter results
         personInput.onkeyup = function() {
+            personDropdownContent.classList.add("show");  // Ensure dropdown stays open
             const filter = this.value.toUpperCase();
+            let hasVisibleItems = false;
+            
             for (let i = 0; i < personLinks.length; i++) {
                 const text = personLinks[i].textContent || personLinks[i].innerText;
                 if (text.toUpperCase().indexOf(filter) > -1) {
                     personLinks[i].style.display = "";
+                    hasVisibleItems = true;
                 } else {
                     personLinks[i].style.display = "none";
                 }
             }
+        };
+
+        // Open dropdown when clicking on search input
+        personInput.onclick = function(e) {
+            e.stopPropagation();
+            personDropdownContent.classList.add("show");
         };
 
         // Handle clicking on a person in the dropdown
@@ -764,30 +775,31 @@ async function reportScreen(){
         dropdownBtn.onclick = function(e) {
             e.preventDefault();
             dropdownContent.classList.toggle("show");
+            myInput.focus();  // Focus on search input
         };
 
-        // Filter dropdown items as user types
+        // Keep dropdown open while typing and filter results
         myInput.onkeyup = function() {
+            dropdownContent.classList.add("show");  // Ensure dropdown stays open
             const filter = this.value.toUpperCase();
+            let hasVisibleItems = false;
+            
             for (let i = 0; i < eventLinks.length; i++) {
                 const text = eventLinks[i].textContent || eventLinks[i].innerText;
                 if (text.toUpperCase().indexOf(filter) > -1) {
                     eventLinks[i].style.display = "";
+                    hasVisibleItems = true;
                 } else {
                     eventLinks[i].style.display = "none";
                 }
             }
         };
 
-        // Handle clicking on an event in the dropdown
-        for (let i = 0; i < eventLinks.length; i++) {
-            eventLinks[i].onclick = function(e) {
-                e.preventDefault();
-                selectedEvent = this.dataset.event;
-                dropdownBtn.innerText = selectedEvent;
-                dropdownContent.classList.remove("show");
-            };
-        }
+        // Open dropdown when clicking on search input
+        myInput.onclick = function(e) {
+            e.stopPropagation();
+            dropdownContent.classList.add("show");
+        };
 
         // ============ SUBMIT BUTTON ============
 
