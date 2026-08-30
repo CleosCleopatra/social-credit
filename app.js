@@ -721,6 +721,7 @@ async function reportScreen(){
         document.getElementById("login-report-button").onclick = async function() {
             const person = document.getElementById("report-person-input").value.trim();
             const errorEl = document.getElementById("report-error");
+            const currentUserID = getSavedID();
 
             // Validate inputs
             if (!person) {
@@ -729,6 +730,24 @@ async function reportScreen(){
             }
             if (!selectedEvent) {
                 errorEl.innerText = "Please select a reason for the report.";
+                return;
+            }
+
+            // Check if trying to report yourself
+            if (String(person) === String(currentUserID)) {
+                errorEl.innerText = "You cannot report yourself.";
+                return;
+            }
+
+            // Check rate limiting - max one report per minute
+            const lastReportTime = parseInt(localStorage.getItem("last_report_time") || "0");
+            const currentTime = Date.now();
+            const timeSinceLastReport = currentTime - lastReportTime;
+            const oneMinuteMs = 60000;
+
+            if (timeSinceLastReport < oneMinuteMs) {
+                const secondsToWait = Math.ceil((oneMinuteMs - timeSinceLastReport) / 1000);
+                errorEl.innerText = `Please wait ${secondsToWait} seconds before submitting another report.`;
                 return;
             }
 
@@ -775,9 +794,13 @@ async function report(person, event) {
             return;
         }
 
-        // Success! Show confirmation and return to login
-        alert("Report submitted successfully");
-        showLogin();
+        // Success! Store the current time to enforce rate limiting
+        localStorage.setItem("last_report_time", Date.now().toString());
+
+        // Show confirmation message as text
+        const errorEl = document.getElementById("report-error");
+        errorEl.innerText = "Report submitted successfully!";
+        errorEl.style.color = "green";  // Change text color to green for success
 
     } catch (error) {
         // Network or server error
