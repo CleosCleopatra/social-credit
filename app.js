@@ -545,9 +545,7 @@ function renderMember(data) {
             // Show the login screen
             showLogin();
         };
-    }
 }
-
 
 
 // reportScreen() - Shows the screen to report another member's behavior
@@ -1068,11 +1066,11 @@ function renderAdmin(
         <!-- Card 2: Either the adjustment form OR the progress display -->
         ${
             running
-                ? renderRunningAdjustment(  <!-- If adjustment is running, show progress -->
+                ? renderRunningAdjustment(  // If adjustment is running, show progress
                     adjustment,
                     password
                   )
-                : renderAdjustmentForm(  <!-- If not running, show form to start one -->
+                : renderAdjustmentForm(  // If not running, show form to start one
                     people,
                     password
                   )
