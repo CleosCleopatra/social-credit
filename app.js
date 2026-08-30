@@ -566,7 +566,7 @@ async function reportScreen(){
 
     const eventsHTML = events_list.map(event => {
         return `
-            <a href="#" data-event="${event}>
+            <a href="#" data-event="${event}">
             ${event}
             </a>
         `;
@@ -695,18 +695,6 @@ async function reportScreen(){
                 ENTER   
             </button>
 
-            document
-                .getElementById("login-report-button")
-                .onclick = function() {
-                    report(
-                        document.getElementById("report-person-input").value,
-                        selectedEvent
-                    )    
-                }
-
-
-            ${eventsHTML}  <!-- Display all the events we created above -->
-
         </div>
     `);
 
@@ -727,6 +715,16 @@ async function reportScreen(){
                 .innerText = selectedEvent;
         };
     }
+    document
+        .getElementById("login-report-button")
+        .onclick = function() {
+            report(
+                document
+                    .getElementById("report-person-input")
+                    .value,
+                selectedEvent
+            );
+        };
 }
 /* ============================================================
    ADMIN LOGIN - Admin authentication screen and password validation
