@@ -553,28 +553,49 @@ async function reportScreen(){
 
     try {
         // Fetch list of events that can be reported
-        const result = await api(
+        const eventsResult = await api(
             "events_list",  // Get available report types/reasons
             {}
         );
 
-        // Check if the request was successful
-        if (!result.success) {
-            throw new Error(result.error || "Failed to load events list");
+        // Fetch list of people that can be reported
+        const peopleResult = await api(
+            "people_list",  // Get list of all people
+            {}
+        );
+
+        // Check if both requests were successful
+        if (!eventsResult.success) {
+            throw new Error(eventsResult.error || "Failed to load events list");
+        }
+        if (!peopleResult.success) {
+            throw new Error(peopleResult.error || "Failed to load people list");
         }
 
-        // Extract the events array from the response
-        const events_list = result.events || [];
+        // Extract the arrays from responses
+        const events_list = eventsResult.events || [];
+        const people_list = peopleResult.people || [];
 
-        // Check if events list is actually an array
+        // Check if both are arrays
         if (!Array.isArray(events_list)) {
-            throw new Error("Events list is not an array: " + JSON.stringify(result));
+            throw new Error("Events list is not an array: " + JSON.stringify(eventsResult));
+        }
+        if (!Array.isArray(people_list)) {
+            throw new Error("People list is not an array: " + JSON.stringify(peopleResult));
         }
 
         const eventsHTML = events_list.map(event => {
             return `
                 <a href="#" data-event="${event}">
                     ${event}
+                </a>
+            `;
+        }).join("");
+
+        const peopleHTML = people_list.map(person => {
+            return `
+                <a href="#" data-person="${person.citizenship_id}">
+                    ${person.name} (${person.citizenship_id})
                 </a>
             `;
         }).join("");
@@ -588,14 +609,27 @@ async function reportScreen(){
                 <h2>Report Member Behavior</h2>
 
                 <p>
-                    Enter the citizenship ID or name of the person you want to report.
+                    Select the person you want to report.
                 </p>
 
-                <!-- Input for person to report -->
-                <input
-                    id="report-person-input"
-                    placeholder="Citizenship ID or Name"
-                >
+                <!-- Dropdown to select the person to report -->
+                <div class="dropdown" style="margin-top: 20px;">
+                    <button id="person-dropdown-button" class="dropbtn">
+                        Select person...
+                    </button>
+                    <div id="personDropdown" class="dropdown-content">
+                        <input 
+                            type="text" 
+                            placeholder="Search by name or ID..." 
+                            id="personInput"
+                        >
+                        ${peopleHTML}
+                    </div>
+                </div>
+
+                <p>
+                    Select the reason for the report.
+                </p>
 
                 <!-- Dropdown to select the reason/event -->
                 <div class="dropdown" style="margin-top: 20px;">
@@ -643,7 +677,7 @@ async function reportScreen(){
             .dropbtn:hover, .dropbtn:focus {
                 background-color: #3e8e41;
             }
-            #myInput {
+            #myInput, #personInput {
                 box-sizing: border-box;
                 font-size: 16px;
                 padding: 12px 16px;
@@ -651,7 +685,7 @@ async function reportScreen(){
                 border-bottom: 1px solid #ddd;
                 width: 100%;
             }
-            #myInput:focus {outline: 3px solid #04AA6D;}
+            #myInput:focus, #personInput:focus {outline: 3px solid #04AA6D;}
             .dropdown {
                 position: relative;
                 display: block;
@@ -679,10 +713,48 @@ async function reportScreen(){
         `;
         document.head.appendChild(style);
 
-        // Variable to store selected event
+        // Variables to store selected values
+        let selectedPerson = null;
         let selectedEvent = null;
 
-        // Get the dropdown button and event links
+        // ============ PERSON DROPDOWN SETUP ============
+
+        const personDropdownBtn = document.getElementById("person-dropdown-button");
+        const personDropdownContent = document.getElementById("personDropdown");
+        const personInput = document.getElementById("personInput");
+        const personLinks = personDropdownContent.getElementsByTagName("a");
+
+        // Toggle person dropdown when button is clicked
+        personDropdownBtn.onclick = function(e) {
+            e.preventDefault();
+            personDropdownContent.classList.toggle("show");
+        };
+
+        // Filter person dropdown items as user types
+        personInput.onkeyup = function() {
+            const filter = this.value.toUpperCase();
+            for (let i = 0; i < personLinks.length; i++) {
+                const text = personLinks[i].textContent || personLinks[i].innerText;
+                if (text.toUpperCase().indexOf(filter) > -1) {
+                    personLinks[i].style.display = "";
+                } else {
+                    personLinks[i].style.display = "none";
+                }
+            }
+        };
+
+        // Handle clicking on a person in the dropdown
+        for (let i = 0; i < personLinks.length; i++) {
+            personLinks[i].onclick = function(e) {
+                e.preventDefault();
+                selectedPerson = this.dataset.person;
+                personDropdownBtn.innerText = this.textContent;  // Show full text (name + ID)
+                personDropdownContent.classList.remove("show");
+            };
+        }
+
+        // ============ EVENT DROPDOWN SETUP ============
+
         const dropdownBtn = document.getElementById("dropdown-button");
         const dropdownContent = document.getElementById("myDropdown");
         const myInput = document.getElementById("myInput");
@@ -690,7 +762,7 @@ async function reportScreen(){
 
         // Toggle dropdown when button is clicked
         dropdownBtn.onclick = function(e) {
-            e.preventDefault();  // Prevent default link behavior
+            e.preventDefault();
             dropdownContent.classList.toggle("show");
         };
 
@@ -710,22 +782,23 @@ async function reportScreen(){
         // Handle clicking on an event in the dropdown
         for (let i = 0; i < eventLinks.length; i++) {
             eventLinks[i].onclick = function(e) {
-                e.preventDefault();  // Prevent default link behavior
-                selectedEvent = this.dataset.event;  // Store selected event
-                dropdownBtn.innerText = selectedEvent;  // Show selected value
-                dropdownContent.classList.remove("show");  // Close dropdown
+                e.preventDefault();
+                selectedEvent = this.dataset.event;
+                dropdownBtn.innerText = selectedEvent;
+                dropdownContent.classList.remove("show");
             };
         }
 
+        // ============ SUBMIT BUTTON ============
+
         // Handle submit button
         document.getElementById("login-report-button").onclick = async function() {
-            const person = document.getElementById("report-person-input").value.trim();
             const errorEl = document.getElementById("report-error");
             const currentUserID = getSavedID();
 
             // Validate inputs
-            if (!person) {
-                errorEl.innerText = "Please enter a citizenship ID or name.";
+            if (!selectedPerson) {
+                errorEl.innerText = "Please select a person to report.";
                 return;
             }
             if (!selectedEvent) {
@@ -734,7 +807,7 @@ async function reportScreen(){
             }
 
             // Check if trying to report yourself
-            if (String(person) === String(currentUserID)) {
+            if (String(selectedPerson) === String(currentUserID)) {
                 errorEl.innerText = "You cannot report yourself.";
                 return;
             }
@@ -755,12 +828,12 @@ async function reportScreen(){
             errorEl.innerText = "Submitting report...";
 
             // Submit the report
-            await report(person, selectedEvent);
+            await report(selectedPerson, selectedEvent);
         };
 
         // Handle back button
         document.getElementById("report-back-button").onclick = function() {
-            showLogin();  // Return to main screen
+            showLogin();
         };
 
     } catch (error) {
