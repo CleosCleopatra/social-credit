@@ -206,43 +206,77 @@ p {
     margin: 60px auto;
 }
 
+/* ---------- GOVERNMENT HEADER ---------- */
+
 .government-header {
     display: flex;
-
     align-items: center;
+    justify-content: center;
+    gap: 25px;
 
-    gap: 18px;
+    margin-bottom: 35px;
+    padding: 25px 15px;
 
-    margin-bottom: 30px;
+    border-bottom: 4px solid var(--red);
 
-    padding-bottom: 20px;
-
-    border-bottom: 2px solid #6c1c1c;
-
+    text-align: left;
 }
 
 .government-symbol {
-    font-size: 42px;
+    font-size: 4.5rem;
+    line-height: 1;
 
-    color: #9d2525;
+    color: white;
+
+    text-shadow:
+        0 0 12px rgba(255,255,255,0.15);
 }
 
 .government-name {
-    font-size: 17px;
+    font-size: clamp(2rem, 6vw, 3.8rem);
 
-    letter-spacing: 2px;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+
+    color: white;
+
+    text-shadow:
+        0 0 10px rgba(255,255,255,0.15);
 }
-
 
 .government-subtitle {
-    font-size: 11px;
+    margin-top: 8px;
 
-    color: #8f6c6c;
+    font-family: monospace;
 
-    letter-spacing: 1px;
+    font-size: 0.9rem;
+    letter-spacing: 0.25em;
 
-    margin-top: 5px;
+    color: #888;
 }
+
+/* Mobile */
+
+@media (max-width: 600px) {
+
+    .government-header {
+        gap: 15px;
+        padding: 20px 5px;
+    }
+
+    .government-symbol {
+        font-size: 3rem;
+    }
+
+    .government-name {
+        font-size: 1.7rem;
+    }
+
+    .government-subtitle {
+        font-size: 0.65rem;
+    }
+}
+
 
 
 .classified {
