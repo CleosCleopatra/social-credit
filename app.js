@@ -573,8 +573,10 @@ async function reportScreen(){
         }
 
         // Extract the arrays from responses
+        // Backend returns: { success: true, events: [...] }
+        // and { success: true, peoples: [{ citizenship_id, peopleName }] }
         const events_list = eventsResult.events || [];
-        const people_list = peopleResult.people || [];
+        const people_list = peopleResult.peoples || [];
 
         // Check if both are arrays
         if (!Array.isArray(events_list)) {
@@ -595,7 +597,7 @@ async function reportScreen(){
         const peopleHTML = people_list.map(person => {
             return `
                 <a href="#" data-person="${person.citizenship_id}">
-                    ${person.name} (${person.citizenship_id})
+                    ${person.peopleName} (${person.citizenship_id})
                 </a>
             `;
         }).join("");
@@ -723,87 +725,51 @@ async function reportScreen(){
         let selectedPerson = null;
         let selectedEvent = null;
 
-        // ============ PERSON DROPDOWN SETUP ============
+        function setupDropdown(buttonId, contentId, inputId, onSelect) {
+            const dropdownBtn = document.getElementById(buttonId);
+            const dropdownContent = document.getElementById(contentId);
+            const searchInput = document.getElementById(inputId);
+            const links = dropdownContent.querySelectorAll("a");
 
-        const peopleDropdownBtn = document.getElementById("dropdown-people-button");
-        const peopleDropdownContent = document.getElementById("myDropdown_people");
-        const peopleMyInput = document.getElementById("myInput_people");
-        const peopleLinks = peopleDropdownContent.getElementsByTagName("a");
-
-        // Toggle dropdown when button is clicked
-        peopleDropdownBtn.onclick = function(e) {
-            e.preventDefault();
-            peopleDropdownContent.classList.toggle("show");
-            peopleMyInput.focus();
-        };
-
-        // Keep dropdown open while typing and filter results
-        peopleMyInput.onkeyup = function() {
-            peopleDropdownContent.classList.add("show");
-            const filter = this.value.toUpperCase();
-
-            for (let i = 0; i < peopleLinks.length; i++) {
-                const text = peopleLinks[i].textContent || peopleLinks[i].innerText;
-                if (text.toUpperCase().indexOf(filter) > -1) {
-                    peopleLinks[i].style.display = "";
-                } else {
-                    peopleLinks[i].style.display = "none";
-                }
-            }
-        };
-
-        // Open dropdown when clicking on search input
-        peopleMyInput.onclick = function(e) {
-            e.stopPropagation();
-            peopleDropdownContent.classList.add("show");
-        };
-
-        // Handle selecting a person from the list
-        for (let i = 0; i < peopleLinks.length; i++) {
-            peopleLinks[i].onclick = function(e) {
+            dropdownBtn.onclick = function(e) {
                 e.preventDefault();
-                selectedPerson = this.dataset.person;
-                peopleDropdownBtn.innerText = this.textContent;
-                peopleDropdownContent.classList.remove("show");
+                dropdownContent.classList.toggle("show");
+                searchInput.focus();
             };
+
+            searchInput.onkeyup = function() {
+                dropdownContent.classList.add("show");
+                const filter = this.value.toUpperCase();
+
+                links.forEach(link => {
+                    const text = (link.textContent || link.innerText || "").toUpperCase();
+                    link.style.display = text.includes(filter) ? "" : "none";
+                });
+            };
+
+            searchInput.onclick = function(e) {
+                e.stopPropagation();
+                dropdownContent.classList.add("show");
+            };
+
+            links.forEach(link => {
+                link.onclick = function(e) {
+                    e.preventDefault();
+                    onSelect(link);
+                    dropdownContent.classList.remove("show");
+                };
+            });
         }
 
-        // ============ EVENT DROPDOWN SETUP ============
+        setupDropdown("dropdown-people-button", "myDropdown_people", "myInput_people", function(link) {
+            selectedPerson = link.dataset.person;
+            document.getElementById("dropdown-people-button").innerText = link.textContent;
+        });
 
-        const dropdownBtn = document.getElementById("dropdown-button");
-        const dropdownContent = document.getElementById("myDropdown");
-        const myInput = document.getElementById("myInput");
-        const eventLinks = dropdownContent.getElementsByTagName("a");
-
-        // Toggle dropdown when button is clicked
-        dropdownBtn.onclick = function(e) {
-            e.preventDefault();
-            dropdownContent.classList.toggle("show");
-            myInput.focus();  // Focus on search input
-        };
-
-        // Keep dropdown open while typing and filter results
-        myInput.onkeyup = function() {
-            dropdownContent.classList.add("show");  // Ensure dropdown stays open
-            const filter = this.value.toUpperCase();
-            let hasVisibleItems = false;
-            
-            for (let i = 0; i < eventLinks.length; i++) {
-                const text = eventLinks[i].textContent || eventLinks[i].innerText;
-                if (text.toUpperCase().indexOf(filter) > -1) {
-                    eventLinks[i].style.display = "";
-                    hasVisibleItems = true;
-                } else {
-                    eventLinks[i].style.display = "none";
-                }
-            }
-        };
-
-        // Open dropdown when clicking on search input
-        myInput.onclick = function(e) {
-            e.stopPropagation();
-            dropdownContent.classList.add("show");
-        };
+        setupDropdown("dropdown-button", "myDropdown", "myInput", function(link) {
+            selectedEvent = link.dataset.event;
+            document.getElementById("dropdown-button").innerText = selectedEvent;
+        });
 
         // ============ SUBMIT BUTTON ============
 
