@@ -612,16 +612,16 @@ async function reportScreen(){
                     Select the person you want to report.
                 </p>
 
-                <!-- Dropdown to select the person to report -->
+                <!-- Dropdown to select the reason/event -->
                 <div class="dropdown" style="margin-top: 20px;">
-                    <button id="person-dropdown-button" class="dropbtn">
+                    <button id="dropdown-people-button" class="dropbtn">
                         Select person...
                     </button>
-                    <div id="personDropdown" class="dropdown-content">
+                    <div id="myDropdown_people" class="dropdown-content">
                         <input 
                             type="text" 
-                            placeholder="Search by name or ID..." 
-                            id="personInput"
+                            placeholder="Search.." 
+                            id="myInput_people"
                         >
                         ${peopleHTML}
                     </div>
@@ -719,50 +719,41 @@ async function reportScreen(){
 
         // ============ PERSON DROPDOWN SETUP ============
 
-        const personDropdownBtn = document.getElementById("person-dropdown-button");
-        const personDropdownContent = document.getElementById("personDropdown");
-        const personInput = document.getElementById("personInput");
-        const personLinks = personDropdownContent.getElementsByTagName("a");
+        
+        const peopleDropdownBtn = document.getElementById("dropdown-people-button");
+        const peopleDropdownContent = document.getElementById("myDropdown_people");
+        const peopleMyInput = document.getElementById("myInput_people");
+        const peopleLinks = dropdownContent.getElementsByTagName("a");
 
-        // Toggle person dropdown when button is clicked
-        personDropdownBtn.onclick = function(e) {
+        // Toggle dropdown when button is clicked
+        peopleDropdownBtn.onclick = function(e) {
             e.preventDefault();
-            personDropdownContent.classList.toggle("show");
-            personInput.focus();  // Focus on search input
+            peopleDropdownContent.classList.toggle("show");
+            peopleMyInput.focus();  // Focus on search input
         };
 
         // Keep dropdown open while typing and filter results
-        personInput.onkeyup = function() {
-            personDropdownContent.classList.add("show");  // Ensure dropdown stays open
+        peopleMyInput.onkeyup = function() {
+            peopleDropdownContent.classList.add("show");  // Ensure dropdown stays open
             const filter = this.value.toUpperCase();
             let hasVisibleItems = false;
             
-            for (let i = 0; i < personLinks.length; i++) {
-                const text = personLinks[i].textContent || personLinks[i].innerText;
+            for (let i = 0; i < peopleLinks.length; i++) {
+                const text = peopleLinks[i].textContent || peopleLinks[i].innerText;
                 if (text.toUpperCase().indexOf(filter) > -1) {
-                    personLinks[i].style.display = "";
+                    peopleLinks[i].style.display = "";
                     hasVisibleItems = true;
                 } else {
-                    personLinks[i].style.display = "none";
+                    peopleLinks[i].style.display = "none";
                 }
             }
         };
 
         // Open dropdown when clicking on search input
-        personInput.onclick = function(e) {
+        peopleMyInput.onclick = function(e) {
             e.stopPropagation();
-            personDropdownContent.classList.add("show");
+            peopleDropdownContent.classList.add("show");
         };
-
-        // Handle clicking on a person in the dropdown
-        for (let i = 0; i < personLinks.length; i++) {
-            personLinks[i].onclick = function(e) {
-                e.preventDefault();
-                selectedPerson = this.dataset.person;
-                personDropdownBtn.innerText = this.textContent;  // Show full text (name + ID)
-                personDropdownContent.classList.remove("show");
-            };
-        }
 
         // ============ EVENT DROPDOWN SETUP ============
 
