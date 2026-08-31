@@ -171,41 +171,63 @@ function showLogin() {
     // Create the login form HTML and display it
     setContent(`
 
-        <div class="card">
 
-            <h2>Citizen identification</h2>
+        <div class="login-screen">
 
-            <p>
-                Enter your citizenship ID.
-            </p>
+            <div class="government-header">
+                <div class = "government-symbol">
+                    ☉
+                </div>
 
-            <!-- Text input field where user types their ID -->
-            <input
-                id="citizenship-input"
-                placeholder="Citizenship ID"
+                <div>
+
+                    <div class="government-name">
+                        CUBSECs citizenship authority
+                    </div>
+
+                    <div class="government-subtitle">
+                        SOCIAL CREDIT ADMINISTRATION
+                    </div>
+                </div>
+            </div>
+
+            <div class = "card login-card">
+                <div class = "classified">
+                    AUTHORIZED CITIZENS ONLY
+                </div>
+
+                <h2>
+                    Citizenship Identification
+                </h2>
+
+                <p class = "small">
+                    Identification is mandatory
+                    All activity is monitored
+                </p>
+
+                <input 
+                    id="citizenship-input"
+                    placeholder = "ENTER CITIZENSHIP ID"
+                >
+
+                <button id = "login button">
+                    VERIFY IDENTITY
+                </button>
+
+                <p
+                    id = "login-error"
+                    class = "error"
+                ></p>
+            
+            </div>
+
+            <button
+                id = "admin-button"
+                class = "admin-link"
             >
-
-            <!-- Button to submit the login form -->
-            <button id="login-button">
-                ENTER
+                ADMINISTRATIVE ACCESS
             </button>
-
-            <!-- Paragraph to show error messages -->
-            <p
-                id="login-error"
-                class="error"
-            ></p>
-
-        </div>
-
-
-        <div class="card">
-
-            <!-- Button to enter admin mode -->
-            <button id="admin-button">
-                ADMIN MODE
-            </button>
-
+        
         </div>
     `);
 
@@ -463,9 +485,22 @@ function renderMember(data) {
             </h2>
 
             <!-- The member's current social credit score (large display) -->
-            <div class="score">
-                ${person.score}  <!-- This is a number like 1500 -->
+
+            <div class="score-panel">
+                <div class = "score-label">
+                    SOCIAL CREDIT SCORE
+                </div>
+
+                <div class="score">
+                    ${person.score}  
+                </div>
+
+                <div class="score-status">
+                    ${getScoreStatus(person.score)}
+                </div>
             </div>
+
+
 
             <!-- Their citizenship ID -->
             <div class="citizenship">
@@ -480,7 +515,7 @@ function renderMember(data) {
         </div>
 
         <!-- Report button: report something -->
-        <button id="report-button">
+        <button id="report-button" class="report-button>
             REPORT DEVIANT BEHAVIOUR
         </button>
 
@@ -489,8 +524,12 @@ function renderMember(data) {
         <div class="card">
 
             <h2>
-                Your reports  <!-- Title for the events section -->
+                Citizen Activity Log
             </h2>
+
+            <p class="small">
+                All recorded behavioural events are PERMANENTLY archieved.
+            </p>
 
             ${eventsHTML}  <!-- Display all the events we created above -->
 
@@ -545,6 +584,18 @@ function renderMember(data) {
             // Show the login screen
             showLogin();
         };
+}
+
+function getScoreStatus(score) {
+    if (score <= 1000) {
+        return "⚠ LOW COMPLIANCE";
+    }
+
+    if (score <= 2000) {
+        return "● ACCEPTABLE CITIZEN";
+    }
+
+    return "★ EXEMPLARY CITIZEN";
 }
 
 
@@ -608,16 +659,16 @@ async function reportScreen(){
             <!-- Reporting Card -->
             <div class="card">
 
-                <h2>Report Member Behavior</h2>
+                <h2>SUBMIT BEHAVIOURAL REPORT</h2>
 
-                <p>
-                    Select the person you want to report.
-                </p>
+                <label>
+                    SUBJECT CITIZEN.
+                </label>
 
                 <!-- Dropdown to select the reason/event -->
                 <div class="dropdown" style="margin-top: 20px;">
                     <button id="dropdown-people-button" class="dropbtn">
-                        Select person...
+                        SELECT CITIZEN.
                     </button>
                     <div id="myDropdown_people" class="dropdown-content">
                         <input 
@@ -629,14 +680,14 @@ async function reportScreen(){
                     </div>
                 </div>
 
-                <p>
-                    Select the reason for the report.
-                </p>
+                <label>
+                    VIOLATION/BEHAVIOURAL EVENT.
+                </label>
 
                 <!-- Dropdown to select the reason/event -->
                 <div class="dropdown" style="margin-top: 20px;">
                     <button id="dropdown-button" class="dropbtn">
-                        Select reason...
+                        SELECT CLASSIFICATION.
                     </button>
                     <div id="myDropdown" class="dropdown-content">
                         <input 
@@ -668,7 +719,7 @@ async function reportScreen(){
         const style = document.createElement('style');
         style.textContent = `
             .dropbtn {
-                background-color: #04AA6D;
+                background-color: #951111;
                 color: white;
                 padding: 12px 16px;
                 font-size: 16px;
@@ -677,7 +728,7 @@ async function reportScreen(){
                 width: 100%;
             }
             .dropbtn:hover, .dropbtn:focus {
-                background-color: #3e8e41;
+                background-color: rgb(54, 6, 6);
             }
             #myInput,
             #myInput_people,

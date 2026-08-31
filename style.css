@@ -123,6 +123,28 @@ p {
     font-size: 0.85rem;
 }
 
+.score-panel {
+    text-align: center;
+
+    margin: 30px 0;
+
+    padding: 25px;
+
+    background: #080303;
+
+    border: 1px solid #542020;
+}
+
+.score-label {
+    font-size: 12px;
+
+    color: #997777;
+
+    letter-spacing: 3px;
+
+    margin-bottom: 8px;
+}
+
 .score {
     margin: 25px 0 10px;
     text-align: center;
@@ -139,6 +161,92 @@ p {
     text-shadow:
         0 0 20px rgba(255,255,255,0.15);
 
+}
+
+.score-status {
+    margin-top: 15px;
+
+    font-size: 13px;
+
+    letter-spacing: 2px;
+
+    color: #b85b5b;
+}
+
+.login-screen {
+    max-width: 600px;
+    margin: 60px auto;
+}
+
+.government-header {
+    display: flex;
+
+    align-items: center;
+
+    gap: 18px;
+
+    margin-bottom: 30px;
+
+    padding-bottom: 20px;
+
+    border-bottom: 2px solid #6c1c1c;
+
+}
+
+.government-symbol {
+    font-size: 42px;
+
+    color: #9d2525;
+}
+
+.government-name {
+    font-size: 17px;
+
+    letter-spacing: 2px;
+}
+
+
+.government-subtitle {
+    font-size: 11px;
+
+    color: #8f6c6c;
+
+    letter-spacing: 1px;
+
+    margin-top: 5px;
+}
+
+
+.classified {
+    display: inline-block;
+
+    padding: 4px 8px;
+
+    border: 1px solid #7c2626;
+
+    color: #b74c4c;
+
+    font-size: 10px;
+
+    letter-spacing: 2px;
+
+    margin-bottom: 15px;
+}
+
+.admin-link {
+    background: transparent;
+
+    border: none;
+
+    color: #6f5555;
+
+    font-size: 11px;
+}
+
+.admin-link:hover {
+    background: transparent;
+
+    color: #a66;
 }
 
 .citizenship {
@@ -265,19 +373,17 @@ label small {
 }
 
 .event {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
+    display: grid;
 
-    padding: 15px 5px;
+    grid-template-columns: 1fr auto;
 
-    border-bottom: 1px solid #333;
+    padding: 15px 0;
+
+    border-bottom: 1px solid #321414;
 }
 
 .event strong {
-    flex: 1;
-
-    min-width: 180px;
+    font-weight: normal;
 }
 
 .event .small {
