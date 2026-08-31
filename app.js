@@ -719,30 +719,27 @@ async function reportScreen(){
 
         // ============ PERSON DROPDOWN SETUP ============
 
-        
         const peopleDropdownBtn = document.getElementById("dropdown-people-button");
         const peopleDropdownContent = document.getElementById("myDropdown_people");
         const peopleMyInput = document.getElementById("myInput_people");
-        const peopleLinks = dropdownContent.getElementsByTagName("a");
+        const peopleLinks = peopleDropdownContent.getElementsByTagName("a");
 
         // Toggle dropdown when button is clicked
         peopleDropdownBtn.onclick = function(e) {
             e.preventDefault();
             peopleDropdownContent.classList.toggle("show");
-            peopleMyInput.focus();  // Focus on search input
+            peopleMyInput.focus();
         };
 
         // Keep dropdown open while typing and filter results
         peopleMyInput.onkeyup = function() {
-            peopleDropdownContent.classList.add("show");  // Ensure dropdown stays open
+            peopleDropdownContent.classList.add("show");
             const filter = this.value.toUpperCase();
-            let hasVisibleItems = false;
-            
+
             for (let i = 0; i < peopleLinks.length; i++) {
                 const text = peopleLinks[i].textContent || peopleLinks[i].innerText;
                 if (text.toUpperCase().indexOf(filter) > -1) {
                     peopleLinks[i].style.display = "";
-                    hasVisibleItems = true;
                 } else {
                     peopleLinks[i].style.display = "none";
                 }
@@ -754,6 +751,16 @@ async function reportScreen(){
             e.stopPropagation();
             peopleDropdownContent.classList.add("show");
         };
+
+        // Handle selecting a person from the list
+        for (let i = 0; i < peopleLinks.length; i++) {
+            peopleLinks[i].onclick = function(e) {
+                e.preventDefault();
+                selectedPerson = this.dataset.person;
+                peopleDropdownBtn.innerText = this.textContent;
+                peopleDropdownContent.classList.remove("show");
+            };
+        }
 
         // ============ EVENT DROPDOWN SETUP ============
 
