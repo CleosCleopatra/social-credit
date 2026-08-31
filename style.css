@@ -123,6 +123,34 @@ p {
     font-size: 0.85rem;
 }
 
+.loading-bar {
+    width: 100%;
+    height: 4px;
+    margin-top: 20px;
+    background: #333;
+    overflow: hidden;
+}
+
+.loading-bar::after {
+    content: "";
+    display: block;
+    width: 40%;
+    height: 100%;
+    background: #a91515;
+
+    animation: loading 1.2s infinite;
+}
+
+@keyframes loading {
+    0% {
+        transform: translateX(-100%);
+    }
+
+    100% {
+        transform: translateX(350%);
+    }
+}
+
 .score-panel {
     text-align: center;
 
