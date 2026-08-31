@@ -200,10 +200,6 @@ function showLogin() {
                     Citizenship Identification
                 </h2>
 
-                <p class = "small">
-                    Identification is mandatory
-                    All activity is monitored
-                </p>
 
                 <input 
                     id="citizenship-input"
@@ -277,7 +273,7 @@ async function login() {
     // Show loading message while we wait for the server
     setContent(`
         <div class="card">
-            Loading...
+            VERIFYING CITIZEN...
         </div>
     `);
 
@@ -346,7 +342,7 @@ async function showMember(id) {
     // Show loading message while we wait for the server
     setContent(`
         <div class="card">
-            Loading...
+            VERIFYING CITIZEN...
         </div>
     `);
 
@@ -601,6 +597,13 @@ function getScoreStatus(score) {
 
 // reportScreen() - Shows the screen to report another member's behavior
 async function reportScreen(){
+    setContent(`
+        <div class="card">
+            <h2>REPORTING SYSTEM</h2>
+            <p>Accessing citizen registry...</p>
+            <div class="loading-bar"></div>
+        </div>
+    `);
 
     try {
         // Fetch list of events that can be reported
@@ -866,7 +869,8 @@ async function reportScreen(){
 
         // Handle back button
         document.getElementById("report-back-button").onclick = function() {
-            showMember();
+            const currentUserID = getSavedID();
+            showMember(currentUserID );
         };
 
     } catch (error) {
@@ -984,7 +988,14 @@ async function adminLogin() {
                 "admin-password"
             )
             .value;  // Get what was typed
-
+    
+    const loginButton =
+        document.getElementById("admin-login-button");
+    const errorElement =
+        document.getElementById("admin-error");
+    loginButton.disabled = true;
+    loginButton.innerText = "AUTHENTICATING...";
+    errorElement.innerText = "";
 
     try {
 
@@ -1001,15 +1012,12 @@ async function adminLogin() {
         // Check if the password was correct
         if (!result.success) {
 
-            // Wrong password! Show error message
-            document
-                .getElementById(
-                    "admin-error"
-                )
-                .innerText =
-                    result.error;  // Show server's error message
+            errorElement.innerText = result.error;
 
-            return;  // Stop here, don't continue
+            loginButton.disabled = false;
+            loginButton.innerText = "LOGIN";
+
+            return;
         }
 
 
@@ -1326,19 +1334,19 @@ function renderAdjustmentForm(
             <!-- Number input to set target count for LOW -->
             <input
                 id="target-low"
-                type="number"  <!-- Only numbers allowed -->
-                min="0"  <!-- Can't be negative -->
+                type="number" 
+                min="0"  
                 value="${getDistribution(
                     people
-                ).low}"  <!-- Start with current distribution -->
+                ).low}"
             >
 
 
             <!-- Input for MID category target -->
             <label>
-                Mid  <!-- Category label -->
+                Mid 
                 <small>
-                    1001 to 2000  <!-- Score range for this category -->
+                    1001 to 2000 
                 </small>
             </label>
 
@@ -1349,15 +1357,15 @@ function renderAdjustmentForm(
                 min="0"
                 value="${getDistribution(
                     people
-                ).mid}"  <!-- Start with current distribution -->
+                ).mid}" 
             >
 
 
             <!-- Input for HIGH category target -->
             <label>
-                High  <!-- Category label -->
+                High 
                 <small>
-                    2001+  <!-- Score range for this category -->
+                    2001+ 
                 </small>
             </label>
 
@@ -1368,24 +1376,24 @@ function renderAdjustmentForm(
                 min="0"
                 value="${getDistribution(
                     people
-                ).high}"  <!-- Start with current distribution -->
+                ).high}" 
             >
 
 
             <!-- Duration setting -->
             <label>
-                Adjustment duration  <!-- How long to run the adjustment -->
+                Adjustment duration 
                 <small>
-                    minutes  <!-- Unit: minutes -->
+                    minutes
                 </small>
             </label>
 
-            <!-- Number input for duration -->
+         
             <input
                 id="duration"
                 type="number"
-                min="1"  <!-- At least 1 minute -->
-                value="180"  <!-- Default: 180 minutes (3 hours) -->
+                min="1" 
+                value="180" 
             >
 
 
