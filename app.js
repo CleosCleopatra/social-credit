@@ -174,22 +174,6 @@ function showLogin() {
 
         <div class="login-screen">
 
-            <div class="government-header">
-                <div class = "government-symbol">
-                    ☉
-                </div>
-
-                <div>
-
-                    <div class="government-name">
-                        CUBSECs citizenship authority
-                    </div>
-
-                    <div class="government-subtitle">
-                        SOCIAL CREDIT ADMINISTRATION
-                    </div>
-                </div>
-            </div>
 
             <div class = "card login-card">
                 <div class = "classified">
