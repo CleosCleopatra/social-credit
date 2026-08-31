@@ -1,57 +1,490 @@
-<!DOCTYPE html>
+:root {
+    --red: #a91515;
+    --dark-red: #701010;
+    --black: #0b0b0b;
+    --dark: #151515;
+    --grey: #242424;
+    --light-grey: #bdbdbd;
+    --white: #eeeeee;
+    --green: #55b86a;
+    --danger: #d12b2b;
+}
 
-<html lang="en">
+* {
+    box-sizing: border-box;
+}
 
-<head>
+body {
+    margin: 0;
+    min-height: 100vh;
 
-    <meta charset="UTF-8">
+    background:
+        radial-gradient(
+            circle at top,
+            #252525 0%,
+            #101010 45%,
+            #070707 100%
+        );
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+    color: var(--white);
 
-    <title>Social Credit</title>
+    font-family:
+        "Arial Narrow",
+        Arial,
+        sans-serif;
 
-    <link
-        rel="stylesheet"
-        href="style.css"
-    >
+    letter-spacing: 0.5px;
+}
 
-    <!-- PyScript -->
-    <link
-        rel="stylesheet"
-        href="https://pyscript.net/releases/2025.7.3/core.css"
-    >
+body::before{
+    content:"";
+    position: fixed;
+    inset: 0;
 
-    <script
-        type="module"
-        src="https://pyscript.net/releases/2025.7.3/core.js"
-    ></script>
+    pointer-events: none;
 
-</head>
+    background:
+        repeating-linear-gradient(
+            0deg,
+            rgba(255,255,255,0.015),
+            rgba(255,255,255,0.015) 1px,
+            transparent 1px,
+            transparent 7px
+        );
+    z-index: 999;
+}
+
+#app > h1 {
+    margin: 0 0 35px;
+    text-align: center;
+    font-size: clamp(2.2rem, 7vw, 4rem);
+    font-weight: 900;
+    letter-spacing: 0.15em;
+
+    color: white;
+
+    text-shadow:
+        0 0 10px rgba(255,255,255,0.15);
+
+    border-bottom: 4px solid var(--red);
+    padding-bottom: 15px;
+}
+
+.card {
+    position:relative;
+    background:
+        linear-gradient(
+            145deg,
+            #202020,
+            #111111
+        );
+    
+    border: 1px solid #3b3b3b;
+    border-left: 5px solid var(--red);
 
 
-<body>
+    padding: 25px;
+    margin-bottom: 20px;
 
-<div id="app">
+    box-shadow:
+        0 8px 25px rgba(0,0,0,0.45);
+}
 
-    <h1>SOCIAL CREDIT</h1>
+.card::before {
+    content: "CITIZEN INFORMATION";
 
-    <div id="content">
+    position: absolute;
+    top: 0;
+    right: 0;
 
-        Loading...
+    padding: 5px 10px;
 
-    </div>
+    font-size: 9px;
+    letter-spacing: 1px;
 
-</div>
+    color: #777;
+}
+
+h2{
+    margin-top: 0;
+
+    text-transform: uppercase;
+
+    font-size: 1.35rem;
+    letter-spacing: 0.08em;
+}
+
+p {
+    line-height: 1.5;
+}
+
+.small {
+    color: #888;
+    font-size: 0.85rem;
+}
+
+.score {
+    margin: 25px 0 10px;
+    text-align: center;
+
+    font-family:
+        "Courier New",
+        monospace;
+
+    font-size: clamp(4rem, 15vw, 7rem);
+    font-weight: bold;
+
+    color: white;
+
+    text-shadow:
+        0 0 20px rgba(255,255,255,0.15);
+
+}
+
+.citizenship {
+    text-align: center;
+
+    padding-top: 10px;
+
+    color: #888;
+
+    font-family: monospace;
+    letter-spacing: 0.1em;
+}
+
+button {
+    width: 100%;
+
+    padding: 14px 18px;
+
+    margin-top: 10px;
+
+    border: 1px solid #555;
+
+    background: #262626;
+    color: white;
+
+    font-size: 0.95rem;
+    font-weight: bold;
+
+    letter-spacing: 0.08em;
+
+    cursor: pointer;
+
+    transition:
+        background 0.15s,
+        border-color 0.15s,
+        transform 0.1s;
+}
+
+button:hover {
+    background: #333;
+    border-color: #888;
+}
+
+button:active {
+    transform: translateY(1px);
+}
+
+#login-button,
+#submit-button,
+#login-report-button,
+#start-adjustment {
+    background: var(--red);
+    border-color: #c52a2a;
+}
+
+#login-button:hover,
+#login-report-button:hover,
+#start-adjustment:hover {
+    background: #c01b1b;
+}
+
+button.danger {
+    background: #6e0808;
+    border-color: #a51515;
+}
+
+button.danger:hover {
+    background: #a51515;
+}
+
+input {
+    width: 100%;
+
+    padding: 14px;
+
+    margin: 8px 0 15px;
+
+    background: #0b0b0b;
+
+    border: 1px solid #444;
+
+    color: white;
+
+    font-family: monospace;
+    font-size: 1rem;
+
+    outline: none;
+}
+
+input:focus {
+    border-color: var(--red);
+
+    box-shadow:
+        0 0 0 1px var(--red);
+}
+
+input::placeholder {
+    color: #666;
+}
 
 
-<!-- Your Python application -->
+label {
+    display: block;
 
-<py-script src="./app.py"></py-script>
+    margin-top: 18px;
+    margin-bottom: 5px;
+
+    text-transform: uppercase;
+
+    font-size: 0.85rem;
+    font-weight: bold;
+    letter-spacing: 0.08em;
+}
+
+label small {
+    display: block;
+
+    margin-top: 3px;
+
+    color: #777;
+
+    text-transform: none;
+    letter-spacing: 0;
+}
+
+.event {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+
+    padding: 15px 5px;
+
+    border-bottom: 1px solid #333;
+}
+
+.event strong {
+    flex: 1;
+
+    min-width: 180px;
+}
+
+.event .small {
+    width: 100%;
+    margin-top: 5px;
+}
+
+.positive {
+    color: var(--green);
+
+    font-family: monospace;
+    font-weight: bold;
+
+    font-size: 1.1rem;
+}
+
+.negative {
+    color: #e34b4b;
+
+    font-family: monospace;
+    font-weight: bold;
+
+    font-size: 1.1rem;
+}
+
+#report-button {
+    margin: 0 0 20px;
+
+    background: #420909;
+    border: 1px solid #8c1515;
+
+    color: #ffb0b0;
+
+    font-size: 1rem;
+}
+
+#report-button:hover {
+    background: #701010;
+    color: white;
+}
+
+.dropdown {
+    position: relative;
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.dropbtn {
+    margin-top: 5px;
+
+    background: #191919;
+    border: 1px solid #555;
+
+    text-align: left;
+}
+
+.dropbtn:hover {
+    background: #292929;
+}
+
+.dropdown-content {
+    display: none;
+
+    position: absolute;
+
+    width: 100%;
+
+    background: #111;
+
+    border: 1px solid #555;
+
+    z-index: 100;
+
+    max-height: 260px;
+
+    overflow-y: auto;
+
+    box-shadow:
+        0 10px 30px rgba(0,0,0,0.6);
+}
+
+.dropdown-content.show {
+    display: block;
+}
 
 
-</body>
+.dropdown-content a {
+    display: block;
 
-</html>
+    padding: 13px 15px;
+
+    color: #ddd;
+
+    text-decoration: none;
+
+    border-bottom: 1px solid #292929;
+}
+
+.dropdown-content a:hover {
+    background: var(--dark-red);
+    color: white;
+}
+
+#myInput,
+#myInput_people {
+    margin: 0;
+
+    border: none;
+    border-bottom: 1px solid #444;
+
+    background: #080808;
+}
+
+.distribution {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap: 10px;
+
+    margin-top: 20px;
+}
+
+.distribution > div {
+    padding: 18px 10px;
+
+    text-align: center;
+
+    background: #111;
+
+    border: 1px solid #333;
+}
+
+
+.distribution strong {
+    display: block;
+
+    font-family: monospace;
+
+    font-size: 2rem;
+}
+
+
+.distribution span {
+    display: block;
+
+    margin-top: 5px;
+
+    color: #888;
+
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+}
+
+.progress {
+    width: 100%;
+    height: 22px;
+
+    margin: 20px 0;
+
+    background: #080808;
+
+    border: 1px solid #444;
+
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+
+    background:
+        repeating-linear-gradient(
+            45deg,
+            #9e1111,
+            #9e1111 10px,
+            #b71919 10px,
+            #b71919 20px
+        );
+
+    transition: width 0.5s ease;
+}
+
+.error {
+    color: #ff6666;
+
+    font-family: monospace;
+}
+
+
+@media (max-width: 500px) {
+
+    #app {
+        width: 94%;
+        padding-top: 25px;
+    }
+
+    .card {
+        padding: 20px;
+    }
+
+    .distribution {
+        gap: 5px;
+    }
+
+    .distribution strong {
+        font-size: 1.5rem;
+    }
+
+}
