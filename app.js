@@ -677,7 +677,9 @@ async function reportScreen(){
             .dropbtn:hover, .dropbtn:focus {
                 background-color: #3e8e41;
             }
-            #myInput, #personInput {
+            #myInput,
+            #myInput_people,
+            #personInput {
                 box-sizing: border-box;
                 font-size: 16px;
                 padding: 12px 16px;
@@ -685,7 +687,11 @@ async function reportScreen(){
                 border-bottom: 1px solid #ddd;
                 width: 100%;
             }
-            #myInput:focus, #personInput:focus {outline: 3px solid #04AA6D;}
+            #myInput:focus,
+            #myInput_people:focus,
+            #personInput:focus {
+                outline: 3px solid #04AA6D;
+            }
             .dropdown {
                 position: relative;
                 display: block;
