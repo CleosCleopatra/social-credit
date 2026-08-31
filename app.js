@@ -815,7 +815,7 @@ async function reportScreen(){
 
         // Handle back button
         document.getElementById("report-back-button").onclick = function() {
-            showLogin();
+            showMember();
         };
 
     } catch (error) {
