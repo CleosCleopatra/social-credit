@@ -626,7 +626,7 @@ async function reportScreen(){
     `);
 
     try {
-        let reportData = getCachedReportData;
+        let reportData = getCachedReportData();
 
         if (reportData) {
             renderReportScreen(
@@ -652,14 +652,6 @@ async function reportScreen(){
             people: result.people || [],
             events: result.events || []
         };
-
-        // Check if both are arrays
-        if (!Array.isArray(events_list)) {
-            throw new Error("Events list is not an array: " + JSON.stringify(eventsResult));
-        }
-        if (!Array.isArray(people_list)) {
-            throw new Error("People list is not an array: " + JSON.stringify(peopleResult));
-        }
 
         saveCachedReportData(
             reportData
