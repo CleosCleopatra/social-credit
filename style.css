@@ -151,27 +151,6 @@ p {
     }
 }
 
-.score-panel {
-    text-align: center;
-
-    margin: 30px 0;
-
-    padding: 25px;
-
-    background: #080303;
-
-    border: 1px solid #542020;
-}
-
-.score-label {
-    font-size: 12px;
-
-    color: #997777;
-
-    letter-spacing: 3px;
-
-    margin-bottom: 8px;
-}
 
 .score {
     margin: 25px 0 10px;
