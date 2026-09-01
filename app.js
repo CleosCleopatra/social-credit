@@ -495,7 +495,7 @@ function renderMember(data) {
         </div>
 
         <!-- Report button: report something -->
-        <button id="report-button" class="report-button>
+        <button id="report-button" class="report-button">
             REPORT DEVIANT BEHAVIOUR
         </button>
 
@@ -921,7 +921,7 @@ function showAdminLogin() {
             <!-- Password input field (hides what user types as dots) -->
             <input
                 id="admin-password"
-                type="password"  <!-- type="password" hides the characters -->
+                type="password" 
                 placeholder="Admin password"
             >
 
