@@ -92,6 +92,40 @@ function getSavedID() {
 }
 
 
+function getCachedReportData() {
+
+    const cached =
+        localStorage.getItem("report_data");
+
+    if (!cached) {
+        return null;
+    }
+
+    try {
+        return JSON.parse(cached);
+    } catch (error) {
+        localStorage.removeItem("report_data");
+        return null;
+    }
+}
+
+
+function saveCachedReportData(data) {
+
+    localStorage.setItem(
+        "report_data",
+        JSON.stringify(data)
+    );
+}
+
+
+function clearCachedReportData() {
+
+    localStorage.removeItem(
+        "report_data"
+    );
+}
+
 // saveID() - Saves a citizenship ID on this computer so we remember it next time
 // Parameter: id - The citizenship ID to save
 function saveID(id) {
@@ -592,31 +626,32 @@ async function reportScreen(){
     `);
 
     try {
+        let reportData = getCachedReportData;
+
+        if (reportData) {
+            renderReportScreen(
+                reportData.people,
+                reportData.events
+            );
+            return
+        }
+
         // Fetch list of events that can be reported
-        const eventsResult = await api(
-            "events_list",  // Get available report types/reasons
+        const result = await api(
+            "report_data",
             {}
         );
 
-        // Fetch list of people that can be reported
-        const peopleResult = await api(
-            "people_list",  // Get list of all people
-            {}
-        );
-
-        // Check if both requests were successful
-        if (!eventsResult.success) {
-            throw new Error(eventsResult.error || "Failed to load events list");
-        }
-        if (!peopleResult.success) {
-            throw new Error(peopleResult.error || "Failed to load people list");
+        if (!result.success) {
+            throw new Error(
+                result.error || "Failed to load report data"
+            );
         }
 
-        // Extract the arrays from responses
-        // Backend returns: { success: true, events: [...] }
-        // and { success: true, peoples: [{ citizenship_id, peopleName }] }
-        const events_list = eventsResult.events || [];
-        const people_list = peopleResult.peoples || [];
+        reportData = {
+            people: result.people || [],
+            events: result.events || []
+        };
 
         // Check if both are arrays
         if (!Array.isArray(events_list)) {
@@ -626,24 +661,43 @@ async function reportScreen(){
             throw new Error("People list is not an array: " + JSON.stringify(peopleResult));
         }
 
-        const eventsHTML = events_list.map(event => {
-            return `
-                <a href="#" data-event="${event}">
-                    ${event}
-                </a>
-            `;
-        }).join("");
+        saveCachedReportData(
+            reportData
+        );
 
-        const peopleHTML = people_list.map(person => {
-            return `
-                <a href="#" data-person="${person.citizenship_id}">
-                    ${person.peopleName} (${person.citizenship_id})
-                </a>
-            `;
-        }).join("");
-
-        // Create and display the reporting form
+        renderReportScreen(
+            reportData.people,
+            reportData.events
+        );
+    }catch (error) {
         setContent(`
+            <div class="card error">
+                Error loading report screen:
+                ${escapeHTML(error.message)}
+            </div>
+        `);
+    }
+    }
+
+function renderReportScreen(people_list, events_list) {
+    const eventsHTML = events_list.map(event => {
+        return `
+            <a href="#" data-event="${event}">
+                ${event}
+            </a>
+        `;
+    }).join("");
+
+    const peopleHTML = people_list.map(person => {
+        return `
+            <a href="#" data-person="${person.citizenship_id}">
+                ${person.peopleName} (${person.citizenship_id})
+            </a>
+        `;
+    }).join("");
+
+    // Create and display the reporting form
+    setContent(`
 
             <!-- Reporting Card -->
             <div class="card">
@@ -859,14 +913,7 @@ async function reportScreen(){
             showMember(currentUserID );
         };
 
-    } catch (error) {
-        setContent(`
-            <div class="card error">
-                Error loading report screen: ${escapeHTML(error.message)}
-            </div>
-        `);
     }
-}
 
 // report() - Sends a report to the server
 // Parameters:
