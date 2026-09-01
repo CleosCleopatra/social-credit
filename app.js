@@ -190,7 +190,7 @@ function showLogin() {
                     placeholder = "ENTER CITIZENSHIP ID"
                 >
 
-                <button id = "login button">
+                <button id = "login-button">
                     VERIFY IDENTITY
                 </button>
 
