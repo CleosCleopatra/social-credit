@@ -70,41 +70,6 @@ body::before{
     padding-bottom: 15px;
 }
 
-.card {
-    position:relative;
-    background:
-        linear-gradient(
-            145deg,
-            #202020,
-            #111111
-        );
-    
-    border: 1px solid #3b3b3b;
-    border-left: 5px solid var(--red);
-
-
-    padding: 25px;
-    margin-bottom: 20px;
-
-    box-shadow:
-        0 8px 25px rgba(0,0,0,0.45);
-}
-
-.card::before {
-    content: "CITIZEN INFORMATION";
-
-    position: absolute;
-    top: 0;
-    right: 0;
-
-    padding: 5px 10px;
-
-    font-size: 9px;
-    letter-spacing: 1px;
-
-    color: #777;
-}
-
 h2{
     margin-top: 0;
 
