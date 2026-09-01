@@ -172,6 +172,13 @@ p {
     margin: 60px auto;
 }
 
+.activity-log {
+    max-height: 300px;
+    overflow-y: auto;
+    margin-top: 15px;
+    padding-right: 8px;
+}
+
 /* ---------- GOVERNMENT HEADER ---------- */
 
 .government-header {

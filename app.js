@@ -508,10 +508,12 @@ function renderMember(data) {
             </h2>
 
             <p class="small">
-                All recorded behavioural events are PERMANENTLY archieved.
+                All recorded behavioural events are PERMANENTLY archived.
             </p>
-
-            ${eventsHTML}  <!-- Display all the events we created above -->
+            
+            <div class = "activity-log">
+                ${eventsHTML}  
+            </div>
 
         </div>
 
