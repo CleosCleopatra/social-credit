@@ -355,12 +355,19 @@ async function login() {
         // Save the ID so we remember the user next time
         saveID(id);
 
-        saveCachedMember(id, result);
+        const cached = getCachedMember(id);
+
+        const merged = {
+          ...result,
+          events: cached?.events ||[]
+        };
+
+        saveCachedMember(id, merged);
 
         // Display the member's profile with their data
-        renderMember(result);
+        renderMember(merged);
 
-        loadMemberEvents(id);
+        await loadMemberEvents(id);
 
     } catch (error) {
         button.disabled = false;
@@ -425,11 +432,19 @@ async function showMember(id) {
 
             return;  // Stop here
         }
-        saveCachedMember(id, result);
+
+        const cached = getCachedMember(id);
+
+        const member = {
+          ...result,
+          events: cached?.events || []
+        };
+
+        saveCachedMember(id, member);
 
 
         // Success! Show the member's profile with the data from the server
-        renderMember(result);
+        renderMember(member);
 
         loadMemberEvents(id);
 
@@ -2617,7 +2632,7 @@ function renderMember(data) {
     // Get the list of events (score adjustments) and reverse them
     // [...data.events] copies the array, .reverse() puts the newest events first
     const events =
-        [...data.events].reverse();
+        [...(data.events || [])].reverse();
 
 
     // This will hold the HTML for displaying all events
