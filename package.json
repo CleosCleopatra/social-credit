@@ -1,0 +1,22 @@
+{
+  "name": "social-credit",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test",
+    "lint": "eslint app.js tests e2e",
+    "format:check": "prettier --check .",
+    "syntax": "node --check app.js",
+    "check": "npm run syntax && npm run lint && npm test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.0.0",
+    "eslint": "^9.0.0",
+    "jsdom": "^26.0.0",
+    "playwright": "^1.0.0",
+    "prettier": "^3.0.0",
+    "vitest": "^3.0.0"
+  }
+}
