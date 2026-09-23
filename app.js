@@ -237,9 +237,9 @@ function updateActivityLog(events) {
         reversedEvents.map(event => `
             <div class="activity-item">
                 <div>
-                    <strong>${event.reason || "Report"}</strong>
+                    <strong>${escapeHTML(event.reason || "Report")}</strong>
                     <div class="activity-date">
-                        ${event.timestamp || ""}
+                        ${escapeHTML(event.timestamp || "")}
                     </div>
                 </div>
 
@@ -278,7 +278,7 @@ async function refreshMember(id) {
             return;
         }
 
-        saveCachedMember(id, result)
+        saveCachedMember(id, result);
         renderMember(result);
 
     } catch (error) {
@@ -332,6 +332,47 @@ async function loadMemberEvents(id) {
    START - The first function that runs when the page loads
 ============================================================ */
 
+async function showMember(id){
+  const cached = getCachedMember(id);
+  if (cached && cached.person) {
+    renderMember(cached);
+    refreshMember(id);
+    return;
+  }
+
+  setContent(`
+        <div class="card">
+            VERIFYING CITIZEN...
+        </div>
+    `);
+
+    try {
+      const result = await api("member", {
+        citizenship_id: id
+      });
+
+      if (!result.success) {
+        clearID();
+        clearCachedMember(id);
+        showLogin();
+        return;
+      }
+
+      if (getSavedID() !== id){
+        return;
+      }
+
+      saveCachedMember(id, result);
+
+      renderMember(result);
+    } catch(error) {
+      setContent(`
+            <div class="card error">
+                ${escapeHTML(error.message)}
+            </div>
+        `);
+    }
+}
 // start() - Checks if the user is already logged in, and shows the right screen
 // If logged in: shows their member dashboard
 // If not logged in: shows the login screen
@@ -464,7 +505,7 @@ async function login() {
         // The server will check if this ID exists and send back the user's info
         const result =
             await api(
-                "member_basic",  // The action we want: get member info
+                "member",  // The action we want: get member info
                 {
                     citizenship_id: id  // Send the ID
                 }
@@ -483,19 +524,12 @@ async function login() {
         // Save the ID so we remember the user next time
         saveID(id);
 
-        const cached = getCachedMember(id);
 
-        const merged = {
-          ...result,
-          events: cached?.events ||[]
-        };
-
-        saveCachedMember(id, merged);
+        saveCachedMember(id, result);
 
         // Display the member's profile with their data
-        renderMember(merged);
+        renderMember(result);
 
-        await loadMemberEvents(id);
 
     } catch (error) {
         button.disabled = false;
@@ -782,8 +816,8 @@ async function reportScreen(){
 function renderReportScreen(people_list, events_list) {
     const eventsHTML = events_list.map(event => {
         return `
-            <a href="#" data-event="${event}">
-                ${event}
+            <a href="#" data-event="${escapeHTML(event)}">
+                ${escapeHTML(event)}
             </a>
         `;
     }).join("");
