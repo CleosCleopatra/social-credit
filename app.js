@@ -958,9 +958,23 @@ function getMember(citizenshipId) {
 
 function reportMember(person, event) {
 
-  const peopleSheet = getSheet(PEOPLE_SHEET);
-  const people = peopleSheet.getDataRange().getValues();
+  const cache = cacheService.getScriptCache();
 
+  let people;
+
+  const cachedPeople = cache.get("people_data");
+
+  if (cachedPeople) {
+    people = JSON.parse(cachedPeople);
+  } else{
+    const peopleSheet = getSheet(PEOPLE_SHEET);
+    const people = peopleSheet.getDataRange().getValues();
+    cache.put(
+      "people_data", 
+      JSON.stringify(people),
+      300
+    );
+  }
 
   let row = -1;
   let oldScore = 0;
@@ -989,8 +1003,16 @@ function reportMember(person, event) {
     });
   }
 
-  const reasonsSheet = getSheet(REASONS_SHEET);
-  const reasons = reasonsSheet.getDataRange().getValues();
+  let reasons;
+  const cachedReasons = cache.get("reasons_data");
+
+  if (cachedReasons){
+    reasons = JSON.parse(cachedReasons);
+  } else{
+    const reasonsSheet = getSheet(REASONS_SHEET);
+    const reasons = reasonsSheet.getDataRange().getValues();
+    cache.put("reasons_data", JSON.stringify(reasons), 300);
+  }
 
   let points = null;
 
@@ -1012,6 +1034,7 @@ function reportMember(person, event) {
 
   const newScore = oldScore + points;
 
+  const peopleSheet = getSheet(PEOPLE_SHEET);
   peopleSheet
     .getRange(row, 3)
     .setValue(newScore);
@@ -1030,6 +1053,13 @@ function reportMember(person, event) {
     new Date(),
     "REPORT"
   ]);
+
+  cache.remove("member_basic_"+ personsCitizenshipId);
+  cache.remove("member_events_" + personsCitizenshipId);
+
+  people[row - 1][2] = newScore;
+
+  cache.put("people_data", JSON.stringify(people), 300);
 
   return jsonResponse({
     success: true,
@@ -3244,6 +3274,7 @@ function renderReportScreen(people_list, events_list) {
 //   - person: Citizenship ID or name of person being reported
 //   - event: The reason/type of report
 async function report(person, event) {
+  const started = performance.now();
     try {
         // Send the report to the server
         const result = await api(
@@ -3253,6 +3284,16 @@ async function report(person, event) {
                 event: event     // Why they're being reported
             }
         );
+
+        console.log(
+          "REPORT REQUEST TOOK:",
+          Math.round(
+            performance.now() - started
+          ),
+          "ms"
+        );
+
+        
 
         // Check if report was successful
         if (!result.success) {
