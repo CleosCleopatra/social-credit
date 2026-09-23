@@ -840,7 +840,10 @@ function renderReportScreen(people_list, events_list) {
                 </button>
 
                 <!-- Back button -->
-                <button id="report-back-button" style="margin-top: 10px;">
+                <button 
+                  id="report-back-button"
+                  type = "button"
+                   style="margin-top: 10px;">
                     BACK
                 </button>
 
@@ -997,9 +1000,23 @@ function renderReportScreen(people_list, events_list) {
         };
 
         // Handle back button
-        document.getElementById("report-back-button").onclick = function() {
+        document.getElementById("report-back-button").onclick = async function(event) {
+            event.preventDefault();
+            event.stopPropagation();
             const currentUserID = getSavedID();
-            showMember(currentUserID );
+
+            if (!currentUserID){
+              showLogin();
+              return;
+            }
+
+            const cachedMember = getCachedMember(currentUserID);
+
+            if (cachedMember && cachedMember.person) {
+              renderMember(cachedMember);
+              refreshMember(currentUserID);
+            }
+            await showMember(currentUserID );
         };
 
     }
