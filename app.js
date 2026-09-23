@@ -810,11 +810,11 @@ function getReportData() {
     people_version: Number(
       getConfigValue("people_version")
     ),
-    resons_version: Number(
-      getConfigValue("reasons_version")
-    )
+    reasons_version: Number(
+      getConfigValue("reasons_version"))
   });
-} catch (error) {
+
+  } catch (error) {
   return jsonResponse({
     success: false,
     error: error.toString()
@@ -958,7 +958,7 @@ function getMember(citizenshipId) {
 
 function reportMember(person, event) {
 
-  const cache = cacheService.getScriptCache();
+  const cache = CacheService.getScriptCache();
 
   let people;
 
@@ -968,7 +968,7 @@ function reportMember(person, event) {
     people = JSON.parse(cachedPeople);
   } else{
     const peopleSheet = getSheet(PEOPLE_SHEET);
-    const people = peopleSheet.getDataRange().getValues();
+    people = peopleSheet.getDataRange().getValues();
     cache.put(
       "people_data", 
       JSON.stringify(people),
@@ -3274,26 +3274,26 @@ function renderReportScreen(people_list, events_list) {
 //   - person: Citizenship ID or name of person being reported
 //   - event: The reason/type of report
 async function report(person, event) {
-  const started = performance.now();
+  //const started = performance.now();
     try {
         // Send the report to the server
         const result = await api(
             "report",  // Tell server to process a report
             {
                 person: person,  // Who to report
-                event: event     // Why they're being reported
+              event: event     // Why they're being reported
             }
         );
 
-        console.log(
-          "REPORT REQUEST TOOK:",
-          Math.round(
-            performance.now() - started
-          ),
-          "ms"
-        );
+        //console.log(
+        //  "REPORT REQUEST TOOK:",
+        //  Math.round(
+        //    performance.now() - started
+        //  ),
+        //  "ms"
+        //);
 
-        
+
 
         // Check if report was successful
         if (!result.success) {
