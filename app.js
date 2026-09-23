@@ -18,9 +18,13 @@ async function api(action, params = {}) {
     // It takes the action and all the params and puts them in the URL
     const query =
         new URLSearchParams({
-            action: action,  // Include the action name
+            action,  // Include the action name
             ...params         // Include all other parameters (the "..." spreads them out)
         });
+
+    const url = `${API_URL}?${query.toString()}`;
+
+    console.log("API request: ", url);
 
 
     // Send the request to the API URL with our query parameters
@@ -28,7 +32,11 @@ async function api(action, params = {}) {
     // "fetch" is a function that sends HTTP requests
     const response =
         await fetch(
-            `${API_URL}?${query.toString()}`  // Combine URL with query string
+            url, {
+              method: "GET",
+              redirect: "follow",
+              cache: "no-store"
+            }
         );
 
 
@@ -41,12 +49,21 @@ async function api(action, params = {}) {
     // Log (print) information about what happened - useful for debugging
     // This shows: the API action, the response status code (200 = success, etc.), and the data
     console.log(
-        "API:",
-        action,
-        response.status,  // HTTP status code (200 = OK, 400 = bad request, etc.)
-        text               // The actual response data
+        "API response: ", {
+          action,
+          url,
+          status: response.status,
+          finalUrl: response.url,
+          contentType: response.headers.get("content-type"),
+          body: text.substring(0,300)
+        }
     );
 
+    if (!response.ok) {
+      throw new Error (
+        `Google Apps Script returned HTTP ${response.status}.`
+      );
+    }
 
     // Check if the response is empty (bad response from server)
     // .trim() removes spaces from the beginning and end
@@ -70,7 +87,8 @@ async function api(action, params = {}) {
         // If parsing fails, the server didn't send proper JSON format
         throw new Error(
             "Google Apps Script did not return JSON:\n" +
-            text.substring(0, 500)  // Show first 500 characters of the bad response
+            `HTTP status: ${response.status}. ` +
+            `Final URL: ${response.url}`
         );
     }
 }
