@@ -1973,4 +1973,6 @@ function startAdminPolling(password) {
 // This line runs automatically when the page finishes loading
 // It calls the start() function, which is the entry point to the whole app
 // It checks if the user is logged in and shows the appropriate screen
-start();
+if (typeof window !== "undefined" && window.__RUN_APP__!==false) {
+  start();
+}
