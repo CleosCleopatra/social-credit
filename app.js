@@ -24,73 +24,69 @@ async function api(action, params = {}) {
 
     const url = `${API_URL}?${query.toString()}`;
 
-    console.log("API request: ", url);
+    const readOnlyAction = new Set([
+      "member", 
+      "member_basic",
+      "member_events",
+      "report_data",
+      "people_list",
+      "events_list",
+      "admin_data",
+      "adjustment_status"
+    ]);
 
+    const maxAttempts = readOnlyAction.has(action) ? 3:1;
 
-    // Send the request to the API URL with our query parameters
-    // "await" means: wait for the server to respond before continuing
-    // "fetch" is a function that sends HTTP requests
-    const response =
-        await fetch(
-            url, {
-              method: "GET",
-              redirect: "follow",
-              cache: "no-store"
-            }
-        );
+    let lastError;
 
+    for (let attempt = 1; attempt <= maxAttempts; attempt++){
+      try {
+        const response = await fetch(url, {
+          method: "GET",
+          redirect: "follow",
+          cache: "no-store"
+        });
 
-    // Get the response text - this is the data the server sent back
-    // "await" means: wait for the server's response to be converted to text
-    const text =
-        await response.text();
+        const text = await response.text();
 
-
-    // Log (print) information about what happened - useful for debugging
-    // This shows: the API action, the response status code (200 = success, etc.), and the data
-    console.log(
-        "API response: ", {
+        console.log("API: ", {
           action,
-          url,
+          attempt,
           status: response.status,
           finalUrl: response.url,
-          contentType: response.headers.get("content-type"),
           body: text.substring(0,300)
+        });
+
+        if (!response.ok) {
+          throw new Error(
+             `Google Apps Script returned HTTP ${response.status}.`
+          );
         }
-    );
 
-    if (!response.ok) {
-      throw new Error (
-        `Google Apps Script returned HTTP ${response.status}.`
-      );
-    }
-
-    // Check if the response is empty (bad response from server)
-    // .trim() removes spaces from the beginning and end
-    // The "!" means "not" - so this says: if text is empty, throw an error
-    if (!text.trim()) {
-
-        throw new Error(
+        if (!text.trim()){
+          throw new Error(
             "Google Apps Script returned an empty response."
-        );
+          );
+        }
+
+        try{
+          return JSON.parse(text);
+        } catch (parseError) {
+          throw new Error(
+            "Google Apps Script did not return JSON."
+          );
+        }
+      } catch (error) {
+        lastError = error; 
+
+        if (attempt < maxAttempts) {
+          await new Promise(resolve =>
+            setTimeout(resolve, attempt * 1000)
+          );
+        }
+      }
     }
-
-
-    // Try to convert the text to a JavaScript object (JSON parsing)
-    try {
-
-        // JSON.parse() converts a text string into a JavaScript object we can use
-        return JSON.parse(text);
-
-    } catch (error) {
-
-        // If parsing fails, the server didn't send proper JSON format
-        throw new Error(
-            "Google Apps Script did not return JSON:\n" +
-            `HTTP status: ${response.status}. ` +
-            `Final URL: ${response.url}`
-        );
-    }
+    throw lastError;
 }
 
 
@@ -256,8 +252,14 @@ function updateActivityLog(events) {
 }
 
 async function refreshMember(id) {
+    if (memberRefreshInProgress) {
+      return;
+    }
+
+    memberRefreshInProgress = true;
+
     try {
-        const result = await api("member_basic", {
+        const result = await api("member", {
             citizenship_id: id
         });
 
@@ -276,25 +278,16 @@ async function refreshMember(id) {
             return;
         }
 
-        const cached = getCachedMember(id);
-
-        const merged = {
-            ...result,
-            events: cached?.events || []
-        };
-
-        saveCachedMember(id, merged);
-
-        renderMember(merged);
-
-        // Load the latest events separately.
-        await loadMemberEvents(id);
+        saveCachedMember(id, result)
+        renderMember(result);
 
     } catch (error) {
         console.error(
             "Background member refresh failed:",
             error
         );
+    } finally {
+      memberRefreshInProgress = false;
     }
 }
 

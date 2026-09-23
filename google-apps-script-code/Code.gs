@@ -209,7 +209,7 @@ function getReportData() {
       const name = String(peopleValues[i][1]).trim();
       const citizenship_id = String(peopleValues[i][0]).trim();
 
-      if (name) {
+      if (citizenship_id && name) {
         people.push({
           citizenship_id:     citizenship_id,
           peopleName: name
@@ -238,11 +238,12 @@ function getReportData() {
     events: events,
     people_version: Number(
       getConfigValue("people_version")
-    ),
+    ) || 0,
     reasons_version: Number(
       getConfigValue("reasons_version")
-    )
+    )||0
   });
+  
 } catch (error) {
   return jsonResponse({
     success: false,
@@ -348,23 +349,28 @@ function getMemberEvents(citizenshipId) {
   }
 
   const eventsSheet = getSheet(EVENTS_SHEET);
-
-  const values = eventsSheet.getDataRange().getValues();
+  const lastRow = eventsSheet.getLastRow();
 
   const memberEvents = [];
 
-  for (let i = 1; i < values.length; i++) {
-    if (
-      String(values[i][1]).trim() === normalizedId
-    ){
-      memberEvents.push({
-        event_id: String(values[i][0]),
-        reason: String(values[i][2]),
-        points: Number(values[i][3]),
-        timestamp: String(values[i][5]),
-        event_type: String(values[i][6])
+  if (lastRow > 1) {
+    const values = eventsSheet
+    .getRange(2,1,lastRow - 1, 7)
+    .getValues();
+
+    for (const row of values) {
+      if (
+        String(row[1]).trim() === normalizedId
+      ){
+        memberEvents.push({
+          event_id: String(row[0]),
+          reason: String(row[2]),
+          points: Number(row[3]),
+          timestamp: String(row[5]),
+          event_type: String(row[6])
       });
     }
+  }
   }
 
   const result = {
