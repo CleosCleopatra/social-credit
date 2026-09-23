@@ -237,6 +237,49 @@ function updateActivityLog(events) {
         `).join("");
 }
 
+async function refreshMember(id) {
+    try {
+        const result = await api("member_basic", {
+            citizenship_id: id
+        });
+
+        if (!result.success) {
+            if (getSavedID() === id) {
+                clearID();
+                clearCachedMember(id);
+                showLogin();
+            }
+
+            return;
+        }
+
+        // Stop if the user has changed account while the request was running.
+        if (getSavedID() !== id) {
+            return;
+        }
+
+        const cached = getCachedMember(id);
+
+        const merged = {
+            ...result,
+            events: cached?.events || []
+        };
+
+        saveCachedMember(id, merged);
+
+        renderMember(merged);
+
+        // Load the latest events separately.
+        await loadMemberEvents(id);
+
+    } catch (error) {
+        console.error(
+            "Background member refresh failed:",
+            error
+        );
+    }
+}
+
 
 async function loadMemberEvents(id) {
     try {
