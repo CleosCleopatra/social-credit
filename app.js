@@ -200,6 +200,80 @@ function setContent(html) {
 }
 
 
+function updateActivityLog(events) {
+    const activityLog =
+        document.querySelector(".activity-log");
+
+    if (!activityLog) {
+        return;
+    }
+
+    const reversedEvents =
+        [...(events || [])].reverse();
+
+    if (!reversedEvents.length) {
+        activityLog.innerHTML =
+            `<div class="empty-state">
+                No reports yet.
+            </div>`;
+        return;
+    }
+
+    activityLog.innerHTML =
+        reversedEvents.map(event => `
+            <div class="activity-item">
+                <div>
+                    <strong>${event.reason || "Report"}</strong>
+                    <div class="activity-date">
+                        ${event.timestamp || ""}
+                    </div>
+                </div>
+
+                <div class="activity-points">
+                    ${event.points > 0 ? "+" : ""}
+                    ${event.points || 0}
+                </div>
+            </div>
+        `).join("");
+}
+
+
+async function loadMemberEvents(id) {
+    try {
+        const result = await api("member_events", {
+            citizenship_id: id
+        });
+
+        if (!result.success) {
+            console.error("Could not load member events:", result.error);
+            return;
+        }
+
+        // Don't update the page if the user has changed accounts
+        if (getSavedID() !== id) {
+            return;
+        }
+
+        const cached = getCachedMember(id);
+
+        if (!cached) {
+            return;
+        }
+
+        cached.events = result.events || [];
+
+        saveCachedMember(id, cached);
+
+        updateActivityLog(cached.events);
+
+    } catch (error) {
+        console.error(
+            "Could not load member events:",
+            error
+        );
+    }
+}
+
 /* ============================================================
    START - The first function that runs when the page loads
 ============================================================ */
