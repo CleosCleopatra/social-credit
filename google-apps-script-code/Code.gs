@@ -1014,11 +1014,9 @@ to the desired interval.
 
 function usefulReasons(
   score,
-  target
+  target,
+  reasons
 ) {
-
-  const reasons =
-    getReasons();
 
   const useful = [];
 
@@ -1325,13 +1323,16 @@ function buildPlan(
           break;
         }
 
+        const reasons = getReasons();
 
-        const possible =
+        for (const person of simulated) {
+            const possible =
           usefulReasons(
             person.score,
-            person.target
+            person.target,
+            reasons
           );
-
+        }
 
         if (
           possible.length === 0
@@ -1612,11 +1613,14 @@ function startAdjustment(params) {
      Build the actual event plan
      BEFORE changing anyone's score.
   */
-
+    const started = Date.now();
   const result =
     buildPlan(
       people,
       targetCounts
+    );
+    Logger.log(
+        "buildPlan took " + (Date.now() - started) + " ms"
     );
 
 

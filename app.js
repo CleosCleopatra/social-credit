@@ -824,8 +824,12 @@ function renderReportScreen(people_list, events_list) {
 
     const peopleHTML = people_list.map(person => {
         return `
-            <a href="#" data-person="${person.citizenship_id}">
-                ${person.peopleName} (${person.citizenship_id})
+            <a 
+              href="#" 
+              data-person="${escapeHTML(person.citizenship_id)}"
+            >
+                ${escapeHTML(person.peopleName)} 
+                (${escapeHTML(person.citizenship_id)})
             </a>
         `;
     }).join("");

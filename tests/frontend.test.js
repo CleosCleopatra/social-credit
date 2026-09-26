@@ -12,13 +12,15 @@ function loadApp(){
         `
       <!doctype html>
       <html>
+        <head></head>
         <body>
           <div id="content"></div>
         </body>
       </html>
     `,
     {
-        url: "http://localhost"
+        url: "http://localhost",
+        runScripts: "dangerously"
     }
     );
 
@@ -29,10 +31,10 @@ function loadApp(){
     globalThis.confirm = () => true;
     globalThis.alert = () => {};
 
-    window.__RUN_APP__ =false;
-    const script = document.createElement("script");
+    dom.window.__RUN_APP__ =false;
+    const script = dom.window.document.createElement("script");
     script.textContent = appSource;
-    document.body.appendChild(script);
+    dom.window.document.body.appendChild(script);
 
     return dom;
 }
