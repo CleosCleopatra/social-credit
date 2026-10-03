@@ -1519,6 +1519,13 @@ function renderAdmin(
 
         </div>
 
+        <button
+            id="admin-rankings"
+            style="margin-top: 10px;"
+        >
+            CITIZENSHIP RANKINGS
+        </button>
+
 
         <!-- Card 4: Control buttons -->
 
@@ -1638,7 +1645,16 @@ personLinks.forEach(link => {
 
 });
 
+    document
+    .getElementById("admin-rankings")
+    .onclick = () => {
 
+        renderAdminRankings(
+            people,
+            password
+        );
+
+    };
     // Refresh button: reload the admin dashboard
     document
         .getElementById(
@@ -1848,6 +1864,223 @@ personLinks.forEach(link => {
 
             }
         };
+}
+
+
+// ============================================================
+// ADMIN RANKINGS SCREEN
+// ============================================================
+
+// renderAdminRankings() - Shows the three highest and three
+// lowest scoring citizens.
+//
+// Parameters:
+//   - people: Array containing all citizens and their scores
+//   - password: Admin password used to return to the dashboard
+
+function renderAdminRankings(
+    people,
+    password
+) {
+
+    // Make a copy so we do not change the original
+    // people array.
+    const sortedPeople = [...people].sort(
+        (a, b) =>
+            Number(b.score) - Number(a.score)
+    );
+
+
+    // Get the three highest scoring citizens.
+    const topThree =
+        sortedPeople.slice(0, 3);
+
+
+    // Get the three lowest scoring citizens.
+    const bottomThree =
+        sortedPeople
+            .slice(-3)
+            .reverse();
+
+
+    // Create the HTML for one citizen.
+    function citizenHTML(
+        person,
+        position
+    ) {
+
+        return `
+            <div
+                class="card"
+                style="
+                    margin-top: 10px;
+                    text-align: center;
+                "
+            >
+
+                <h2>
+                    ${position}
+                </h2>
+
+                <p
+                    style="
+                        font-size: 22px;
+                        font-weight: bold;
+                    "
+                >
+                    ${escapeHTML(person.name)}
+                </p>
+
+                <p class="small">
+                    CITIZENSHIP ID:
+                    ${escapeHTML(person.citizenship_id)}
+                </p>
+
+                <p
+                    style="
+                        font-size: 32px;
+                        font-weight: bold;
+                    "
+                >
+                    ${escapeHTML(person.score)}
+                </p>
+
+            </div>
+        `;
+    }
+
+
+    setContent(`
+
+        <div class="card">
+
+            <h2>
+                CITIZENSHIP RANKINGS
+            </h2>
+
+            <p
+                style="
+                    text-align: center;
+                    font-size: 18px;
+                    font-weight: bold;
+                "
+            >
+                PRODUCTIVITY IS NOT A CHOICE.
+                PRODUCTIVITY IS A DUTY.
+            </p>
+
+            <p class="small">
+                The following citizens have been identified
+                as examples of appropriate and inappropriate
+                contribution to society.
+            </p>
+
+        </div>
+
+
+        <!-- ================================================= -->
+        <!-- TOP THREE -->
+        <!-- ================================================= -->
+
+        <div class="card">
+
+            <h2>
+                EXEMPLARY CITIZENS
+            </h2>
+
+            <p
+                style="
+                    text-align: center;
+                    font-weight: bold;
+                "
+            >
+                THEIR CONTRIBUTION STRENGTHENS THE STATE.
+            </p>
+
+            ${topThree
+                .map(
+                    (person, index) =>
+                        citizenHTML(
+                            person,
+                            `#${index + 1}`
+                        )
+                )
+                .join("")
+            }
+
+        </div>
+
+
+        <!-- ================================================= -->
+        <!-- BOTTOM THREE -->
+        <!-- ================================================= -->
+
+        <div class="card">
+
+            <h2>
+                CITIZENS REQUIRING CORRECTION
+            </h2>
+
+            <p
+                style="
+                    text-align: center;
+                    font-weight: bold;
+                "
+            >
+                IMPROVEMENT IS MANDATORY.
+            </p>
+
+            ${bottomThree
+                .map(
+                    (person, index) =>
+                        citizenHTML(
+                            person,
+                            `#${index + 1}`
+                        )
+                )
+                .join("")
+            }
+
+        </div>
+
+
+        <div class="card">
+
+            <p
+                style="
+                    text-align: center;
+                    font-size: 18px;
+                    font-weight: bold;
+                "
+            >
+                REMEMBER:
+                <br>
+                YOUR SCORE IS A REFLECTION OF YOUR
+                CONTRIBUTION.
+                <br><br>
+                YOUR CONTRIBUTION IS A REFLECTION
+                OF YOUR LOYALTY.
+            </p>
+
+            <button
+                id="admin-rankings-back"
+                style="margin-top: 15px;"
+            >
+                RETURN TO ADMINISTRATION
+            </button>
+
+        </div>
+
+    `);
+
+
+    // Return to the normal admin dashboard.
+    document
+        .getElementById(
+            "admin-rankings-back"
+        )
+        .onclick = () =>
+            showAdmin(password);
 }
 
 
