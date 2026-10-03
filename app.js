@@ -1426,7 +1426,78 @@ function renderAdmin(
         }
 
 
-        <!-- Card 3: Control buttons -->
+                <!-- Card 3: Custom administrative event -->
+
+        <div class="card">
+
+            <h2>
+                ADMINISTRATIVE EVENT
+            </h2>
+
+            <p class="small">
+                Issue a one-time report not contained in the standard classification registry.
+            </p>
+
+            <label>
+                SUBJECT CITIZEN
+            </label>
+
+            <select id="custom-event-person">
+
+                <option value="">
+                    SELECT CITIZEN
+                </option>
+
+                ${people.map(person => `
+                    <option value="${escapeHTML(person.citizenship_id)}">
+                        ${escapeHTML(person.name)}
+                        (${escapeHTML(person.citizenship_id)})
+                    </option>
+                `).join("")}
+
+            </select>
+
+
+            <label>
+                CUSTOM CLASSIFICATION
+            </label>
+
+            <input
+                id="custom-event-reason"
+                type="text"
+                placeholder="ENTER CLASSIFICATION"
+            >
+
+
+            <label>
+                SOCIAL CREDIT ADJUSTMENT
+            </label>
+
+            <input
+                id="custom-event-points"
+                type="number"
+                placeholder="e.g. -250"
+            >
+
+
+            <p
+                id="custom-event-error"
+                class="error"
+            ></p>
+
+
+            <button
+                id="custom-event-submit"
+                style="margin-top: 15px;"
+            >
+                ISSUE ADMINISTRATIVE REPORT
+            </button>
+
+        </div>
+
+
+        <!-- Card 4: Control buttons -->
+
         <div class="card">
 
             <!-- Refresh data button -->
@@ -1490,6 +1561,170 @@ function renderAdmin(
             .onclick = () =>
                 stopAdjustment(password);  // When clicked, stop adjustment
     }
+        // ------------------------------------------------------------
+    // CUSTOM ADMINISTRATIVE EVENT
+    // ------------------------------------------------------------
+
+    document
+        .getElementById("custom-event-submit")
+        .onclick = async () => {
+
+            const person =
+                document
+                    .getElementById("custom-event-person")
+                    .value;
+
+            const reason =
+                document
+                    .getElementById("custom-event-reason")
+                    .value
+                    .trim();
+
+            const points =
+                Number(
+                    document
+                        .getElementById("custom-event-points")
+                        .value
+                );
+
+            const errorElement =
+                document
+                    .getElementById("custom-event-error");
+
+            const button =
+                document
+                    .getElementById("custom-event-submit");
+
+
+            // ----------------------------------------------------
+            // VALIDATION
+            // ----------------------------------------------------
+
+            if (!person) {
+
+                errorElement.innerText =
+                    "SELECT A CITIZEN.";
+
+                return;
+            }
+
+
+            if (!reason) {
+
+                errorElement.innerText =
+                    "ENTER A CLASSIFICATION.";
+
+                return;
+            }
+
+
+            if (isNaN(points)) {
+
+                errorElement.innerText =
+                    "ENTER A VALID POINT VALUE.";
+
+                return;
+            }
+
+
+            // ----------------------------------------------------
+            // CONFIRM
+            // ----------------------------------------------------
+
+            const selectedPerson =
+                people.find(
+                    p =>
+                        p.citizenship_id === person
+                );
+
+
+            if (
+                !confirm(
+                    `Issue administrative report?\n\n` +
+                    `Citizen: ${selectedPerson.name}\n` +
+                    `Classification: ${reason}\n` +
+                    `Points: ${points > 0 ? "+" : ""}${points}`
+                )
+            ) {
+                return;
+            }
+
+
+            // ----------------------------------------------------
+            // SEND TO SERVER
+            // ----------------------------------------------------
+
+            button.disabled = true;
+
+            button.innerText =
+                "PROCESSING...";
+
+            errorElement.innerText = "";
+
+
+            try {
+
+                const result =
+                    await api(
+                        "add_event",
+                        {
+                            password: password,
+
+                            citizenship_id:
+                                person,
+
+                            reason:
+                                reason,
+
+                            points:
+                                points,
+
+                            reported_by:
+                                "ADMIN"
+                        }
+                    );
+
+
+                if (!result.success) {
+
+                    errorElement.innerText =
+                        result.error;
+
+                    return;
+                }
+
+
+                // ------------------------------------------------
+                // SUCCESS
+                // ------------------------------------------------
+
+                alert(
+                    "ADMINISTRATIVE REPORT ISSUED.\n\n" +
+                    `${selectedPerson.name}: ` +
+                    `${result.old_score} → ` +
+                    `${result.new_score}`
+                );
+
+
+                // Reload dashboard so the new score is visible
+
+                await showAdmin(password);
+
+
+            } catch (error) {
+
+                errorElement.innerText =
+                    error.message;
+
+            } finally {
+
+                button.disabled = false;
+
+                button.innerText =
+                    "ISSUE ADMINISTRATIVE REPORT";
+
+            }
+        };
 }
 
 
@@ -1885,9 +2120,6 @@ async function stopAdjustment(password) {
 ============================================================ */
 
 // escapeHTML() - Converts special HTML characters to safe versions
-// This prevents "injection attacks" where bad data could break the page
-// Parameter: value - Text that might contain HTML characters
-// Returns: Safe version of the text
 function escapeHTML(value) {
 
     // Convert text to string and replace dangerous characters:
@@ -1904,13 +2136,10 @@ function escapeHTML(value) {
    AUTO REFRESH WHILE ADJUSTMENT IS RUNNING - Auto-poll for updates
 ============================================================ */
 
-// This variable stores the ID of the polling interval
-// We need this so we can stop polling when the adjustment is done
 let adminRefreshTimer = null;
 
 
 // startAdminPolling() - Automatically refresh admin dashboard every 10 seconds
-// This is used while an adjustment is running to show live progress updates
 // Parameter: password - Admin password for server authentication
 function startAdminPolling(password) {
 
