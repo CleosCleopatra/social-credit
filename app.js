@@ -1354,7 +1354,7 @@ function renderAdmin(
     adjustment,
     password
 ) {
-    let selectedCustomEventPerson = [];
+    let selectedCustomEventPeople = [];
 
     // Get the distribution of people across score categories
     const distribution =
@@ -1706,84 +1706,6 @@ personLinks.forEach(link => {
 
 });
 
-// Open / close dropdown
-
-personButton.onclick = function(event) {
-
-    event.preventDefault();
-
-    personDropdown.classList.toggle("show");
-
-    personSearch.focus();
-};
-
-
-// Search people
-
-personSearch.onkeyup = function() {
-
-    personDropdown.classList.add("show");
-
-    const filter =
-        this.value.toUpperCase();
-
-
-    personLinks.forEach(link => {
-
-        const text =
-            (
-                link.textContent ||
-                link.innerText ||
-                ""
-            ).toUpperCase();
-
-
-        link.style.display =
-            text.includes(filter)
-                ? ""
-                : "none";
-
-    });
-
-};
-
-
-// Prevent dropdown from closing when clicking search
-
-personSearch.onclick = function(event) {
-
-    event.stopPropagation();
-
-    personDropdown.classList.add("show");
-
-};
-
-
-// Select person
-
-personLinks.forEach(link => {
-
-    link.onclick = function(event) {
-
-        event.preventDefault();
-
-
-        selectedCustomEventPerson =
-            link.dataset.person;
-
-
-        personButton.innerText =
-            link.textContent.trim();
-
-
-        personDropdown.classList.remove(
-            "show"
-        );
-
-    };
-
-});
-
     document
     .getElementById("admin-rankings")
     .onclick = () => {
@@ -2105,6 +2027,8 @@ personLinks.forEach(link => {
     }
 
 };
+
+}
 
 
 // ============================================================
