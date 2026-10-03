@@ -1354,6 +1354,7 @@ function renderAdmin(
     adjustment,
     password
 ) {
+    let selectedCustomEventPerson = null;
 
     // Get the distribution of people across score categories
     const distribution =
@@ -1442,20 +1443,43 @@ function renderAdmin(
                 SUBJECT CITIZEN
             </label>
 
-            <select id="custom-event-person">
+            <div
+                class="dropdown"
+                style="margin-top: 20px;"
+            >
 
-                <option value="">
-                    SELECT CITIZEN
-                </option>
+            <button
+                id="custom-event-person-button"
+                class="dropbtn"
+                type="button"
+            >
+                SELECT CITIZEN.
+            </button>
+
+            <div
+                id="custom-event-person-dropdown"
+                class="dropdown-content"
+            >
+
+                <input
+                    type="text"
+                    placeholder="Search name..."
+                    id="custom-event-person-search"
+                >
 
                 ${people.map(person => `
-                    <option value="${escapeHTML(person.citizenship_id)}">
+                    <a
+                        href="#"
+                        data-person="${escapeHTML(person.citizenship_id)}"
+                    >
                         ${escapeHTML(person.name)}
                         (${escapeHTML(person.citizenship_id)})
-                    </option>
+                    </a>
                 `).join("")}
 
-            </select>
+            </div>
+
+        </div>
 
 
             <label>
@@ -1512,6 +1536,107 @@ function renderAdmin(
 
         </div>
     `);
+
+    // ------------------------------------------------------------
+// CUSTOM EVENT - CITIZEN SEARCH
+// ------------------------------------------------------------
+
+const personButton =
+    document.getElementById(
+        "custom-event-person-button"
+    );
+
+const personDropdown =
+    document.getElementById(
+        "custom-event-person-dropdown"
+    );
+
+const personSearch =
+    document.getElementById(
+        "custom-event-person-search"
+    );
+
+const personLinks =
+    personDropdown.querySelectorAll("a");
+
+
+// Open / close dropdown
+
+personButton.onclick = function(event) {
+
+    event.preventDefault();
+
+    personDropdown.classList.toggle("show");
+
+    personSearch.focus();
+};
+
+
+// Search people
+
+personSearch.onkeyup = function() {
+
+    personDropdown.classList.add("show");
+
+    const filter =
+        this.value.toUpperCase();
+
+
+    personLinks.forEach(link => {
+
+        const text =
+            (
+                link.textContent ||
+                link.innerText ||
+                ""
+            ).toUpperCase();
+
+
+        link.style.display =
+            text.includes(filter)
+                ? ""
+                : "none";
+
+    });
+
+};
+
+
+// Prevent dropdown from closing when clicking search
+
+personSearch.onclick = function(event) {
+
+    event.stopPropagation();
+
+    personDropdown.classList.add("show");
+
+};
+
+
+// Select person
+
+personLinks.forEach(link => {
+
+    link.onclick = function(event) {
+
+        event.preventDefault();
+
+
+        selectedCustomEventPerson =
+            link.dataset.person;
+
+
+        personButton.innerText =
+            link.textContent.trim();
+
+
+        personDropdown.classList.remove(
+            "show"
+        );
+
+    };
+
+});
 
 
     // Refresh button: reload the admin dashboard
@@ -1570,9 +1695,7 @@ function renderAdmin(
         .onclick = async () => {
 
             const person =
-                document
-                    .getElementById("custom-event-person")
-                    .value;
+                selectedCustomEventPerson;
 
             const reason =
                 document

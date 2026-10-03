@@ -54,6 +54,67 @@ body::before{
     z-index: 999;
 }
 
+.dropbtn {
+    background-color: #951111;
+    color: white;
+    padding: 12px 16px;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+}
+
+.dropbtn:hover,
+.dropbtn:focus {
+    background-color: rgb(54, 6, 6);
+}
+
+.dropdown {
+    position: relative;
+    display: block;
+    width: 100%;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f6f6f6;
+    width: 100%;
+    overflow: auto;
+    border: 1px solid #ddd;
+    z-index: 10;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.dropdown-content a {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+}
+
+.dropdown-content a:hover {
+    background-color: #ddd;
+}
+
+.dropdown-content.show {
+    display: block;
+}
+
+#custom-event-person-search {
+    box-sizing: border-box;
+    font-size: 16px;
+    padding: 12px 16px;
+    border: none;
+    border-bottom: 1px solid #ddd;
+    width: 100%;
+}
+
+#custom-event-person-search:focus {
+    outline: 3px solid #04AA6D;
+}
+
 #app > h1 {
     margin: 0 0 35px;
     text-align: center;
