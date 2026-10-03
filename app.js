@@ -2042,6 +2042,7 @@ personLinks.forEach(link => {
 //   - people: Array containing all citizens and their scores
 //   - password: Admin password used to return to the dashboard
 
+
 function renderAdminRankings(
     people,
     password
@@ -2051,10 +2052,6 @@ function renderAdminRankings(
             Number(b.score) - Number(a.score)
     );
 
-    /*
-       These citizens are excluded from the
-       three detailed ranking columns.
-    */
     const excludedNames = new Set([
         "Adrian Wireklint",
         "Emanuel Aspman",
@@ -2066,9 +2063,6 @@ function renderAdminRankings(
         "Xenia Lööf"
     ]);
 
-    /*
-       TOP / BOTTOM THREE
-    */
     const topThree =
         sortedPeople.slice(0, 3);
 
@@ -2077,13 +2071,6 @@ function renderAdminRankings(
             .slice(-3)
             .reverse();
 
-
-    /*
-       PEOPLE USED IN THE THREE COLUMNS.
-
-       The eight excluded citizens are removed,
-       but everyone else remains.
-    */
     const columnPeople =
         sortedPeople.filter(person =>
             !excludedNames.has(
@@ -2091,13 +2078,6 @@ function renderAdminRankings(
             )
         );
 
-
-    /*
-       Three ranking groups:
-       - Top 9
-       - Middle 10
-       - Worst 8
-    */
     const topNine =
         columnPeople.slice(0, 9);
 
@@ -2109,72 +2089,7 @@ function renderAdminRankings(
 
 
     /*
-       Small ranking entry.
-    */
-    function rankingPersonHTML(
-        person,
-        rank
-    ) {
-        return `
-            <div
-                class="ranking-person"
-                style="
-                    display: flex;
-                    align-items: center;
-                    justify-content: space-between;
-                    gap: 10px;
-                    padding: 10px 12px;
-                    border-bottom: 1px solid #ddd;
-                    background: #fff;
-                "
-            >
-                <div
-                    style="
-                        display: flex;
-                        align-items: center;
-                        gap: 10px;
-                        min-width: 0;
-                    "
-                >
-                    <span
-                        style="
-                            font-weight: bold;
-                            width: 28px;
-                            flex-shrink: 0;
-                            color: #777;
-                        "
-                    >
-                        ${rank}
-                    </span>
-
-                    <span
-                        style="
-                            font-weight: bold;
-                            overflow: hidden;
-                            text-overflow: ellipsis;
-                            white-space: nowrap;
-                        "
-                    >
-                        ${escapeHTML(person.name)}
-                    </span>
-                </div>
-
-                <span
-                    style="
-                        font-weight: bold;
-                        white-space: nowrap;
-                        font-size: 18px;
-                    "
-                >
-                    ${escapeHTML(person.score)}
-                </span>
-            </div>
-        `;
-    }
-
-
-    /*
-       Large top/bottom citizen cards.
+       LARGE TOP / BOTTOM CARDS
     */
     function podiumHTML(
         person,
@@ -2182,47 +2097,61 @@ function renderAdminRankings(
         type
     ) {
 
-        let title = "";
-        let subtitle = "";
+        const isTop =
+            type === "top";
 
-        if (type === "top") {
-            title =
-                position === 1
-                    ? "★ #1"
-                    : `#${position}`;
+        const title =
+            isTop
+                ? (
+                    position === 1
+                        ? "★ #1"
+                        : `#${position}`
+                )
+                : `#${position}`;
 
-            subtitle =
-                position === 1
-                    ? "MOST EXEMPLARY CITIZEN"
-                    : "EXEMPLARY CITIZEN";
-
-        } else {
-            title =
-                `#${position}`;
-
-            subtitle =
-                "CITIZEN REQUIRING CORRECTION";
-        }
+        const subtitle =
+            isTop
+                ? (
+                    position === 1
+                        ? "MOST EXEMPLARY CITIZEN"
+                        : "EXEMPLARY CITIZEN"
+                )
+                : "CITIZEN REQUIRING CORRECTION";
 
         return `
             <div
-                class="card"
                 style="
-                    margin: 0;
-                    text-align: center;
                     flex: 1;
                     min-width: 0;
-                    padding: 22px 15px;
-                    border: 2px solid #222;
-                    box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+                    padding: 20px 15px;
+                    text-align: center;
+
+                    background:
+                        ${isTop
+                            ? "linear-gradient(180deg, #951111 0%, #5e0808 100%)"
+                            : "linear-gradient(180deg, #3d0808 0%, #210303 100%)"};
+
+                    color: white;
+
+                    border:
+                        2px solid
+                        ${isTop
+                            ? "#951111"
+                            : "#210303"};
+
+                    border-radius: 3px;
+
+                    box-shadow:
+                        0 4px 10px
+                        rgba(0,0,0,0.22);
                 "
             >
 
                 <div
                     style="
-                        font-size: 28px;
+                        font-size: 27px;
                         font-weight: bold;
-                        margin-bottom: 8px;
+                        margin-bottom: 7px;
                     "
                 >
                     ${title}
@@ -2230,9 +2159,10 @@ function renderAdminRankings(
 
                 <div
                     style="
-                        font-size: 11px;
-                        letter-spacing: 1px;
+                        font-size: 10px;
+                        letter-spacing: 1.2px;
                         font-weight: bold;
+                        opacity: 0.85;
                         margin-bottom: 12px;
                     "
                 >
@@ -2241,9 +2171,9 @@ function renderAdminRankings(
 
                 <div
                     style="
-                        font-size: 21px;
+                        font-size: 20px;
                         font-weight: bold;
-                        margin-bottom: 8px;
+                        margin-bottom: 7px;
                     "
                 >
                     ${escapeHTML(person.name)}
@@ -2251,9 +2181,9 @@ function renderAdminRankings(
 
                 <div
                     style="
-                        font-size: 12px;
-                        color: #666;
-                        margin-bottom: 12px;
+                        font-size: 11px;
+                        opacity: 0.7;
+                        margin-bottom: 10px;
                     "
                 >
                     ${escapeHTML(person.citizenship_id)}
@@ -2274,54 +2204,182 @@ function renderAdminRankings(
 
 
     /*
-       Ranking column.
+       SMALL RANKING ROW
     */
-    function rankingColumnHTML(
-        title,
-        subtitle,
-        peopleInColumn,
-        startRank
+    function rankingPersonHTML(
+        person,
+        rank
     ) {
-
         return `
             <div
-                class="card"
                 style="
-                    padding: 0;
-                    overflow: hidden;
-                    margin: 0;
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+
+                    gap: 10px;
+
+                    padding: 9px 12px;
+
+                    background: #ffffff;
+
+                    border-bottom:
+                        1px solid #e2caca;
                 "
             >
 
                 <div
                     style="
-                        padding: 18px 15px;
-                        border-bottom: 3px solid #222;
-                        text-align: center;
-                        background: #f2f2f2;
+                        display: flex;
+                        align-items: center;
+                        gap: 9px;
+                        min-width: 0;
                     "
                 >
-                    <h2
+
+                    <span
                         style="
-                            margin: 0 0 5px 0;
-                            font-size: 19px;
+                            width: 25px;
+                            flex-shrink: 0;
+
+                            font-size: 12px;
+                            font-weight: bold;
+
+                            color: #951111;
                         "
                     >
-                        ${title}
-                    </h2>
+                        ${rank}
+                    </span>
+
+                    <span
+                        style="
+                            font-weight: bold;
+
+                            overflow: hidden;
+                            text-overflow: ellipsis;
+                            white-space: nowrap;
+
+                            color: #222;
+                        "
+                    >
+                        ${escapeHTML(person.name)}
+                    </span>
+
+                </div>
+
+                <span
+                    style="
+                        white-space: nowrap;
+
+                        font-size: 17px;
+                        font-weight: bold;
+
+                        color: #951111;
+                    "
+                >
+                    ${escapeHTML(person.score)}
+                </span>
+
+            </div>
+        `;
+    }
+
+
+    /*
+       RANKING COLUMN
+    */
+    function rankingColumnHTML(
+        title,
+        subtitle,
+        peopleInColumn,
+        startRank,
+        type
+    ) {
+
+        let headerBackground;
+        let headerColor;
+
+        if (type === "top") {
+            headerBackground = "#951111";
+            headerColor = "white";
+        } else if (type === "middle") {
+            headerBackground = "#6f0d0d";
+            headerColor = "white";
+        } else {
+            headerBackground = "#3d0808";
+            headerColor = "white";
+        }
+
+        return `
+            <div
+                style="
+                    padding: 0;
+                    overflow: hidden;
+
+                    background: #ffffff;
+
+                    border:
+                        1px solid #c99b9b;
+
+                    border-radius: 3px;
+
+                    box-shadow:
+                        0 3px 8px
+                        rgba(0,0,0,0.12);
+                "
+            >
+
+                <div
+                    style="
+                        padding: 15px 12px 13px 12px;
+
+                        text-align: center;
+
+                        background:
+                            ${headerBackground};
+
+                        color:
+                            ${headerColor};
+
+                        border-bottom:
+                            4px solid #210303;
+                    "
+                >
 
                     <div
                         style="
-                            font-size: 11px;
+                            font-size: 18px;
                             font-weight: bold;
-                            color: #666;
+
+                            letter-spacing: 0.5px;
+
+                            margin-bottom: 4px;
+                        "
+                    >
+                        ${title}
+                    </div>
+
+                    <div
+                        style="
+                            font-size: 10px;
+                            font-weight: bold;
+
+                            letter-spacing: 1px;
+
+                            opacity: 0.8;
                         "
                     >
                         ${subtitle}
                     </div>
+
                 </div>
 
-                <div>
+                <div
+                    style="
+                        background: #ffffff;
+                    "
+                >
+
                     ${
                         peopleInColumn.length > 0
                             ? peopleInColumn
@@ -2345,6 +2403,7 @@ function renderAdminRankings(
                                 </div>
                             `
                     }
+
                 </div>
 
             </div>
@@ -2357,16 +2416,36 @@ function renderAdminRankings(
         <!-- HEADER -->
 
         <div
-            class="card"
             style="
-                text-align: center;
                 margin-bottom: 20px;
+
+                padding: 22px;
+
+                text-align: center;
+
+                color: white;
+
+                background:
+                    linear-gradient(
+                        135deg,
+                        #951111,
+                        #4a0606
+                    );
+
+                border-radius: 3px;
+
+                box-shadow:
+                    0 4px 10px
+                    rgba(0,0,0,0.2);
             "
         >
+
             <h1
                 style="
-                    margin-bottom: 8px;
+                    margin: 0 0 8px 0;
+
                     letter-spacing: 2px;
+                    font-size: 27px;
                 "
             >
                 CITIZENSHIP RANKINGS
@@ -2374,18 +2453,29 @@ function renderAdminRankings(
 
             <p
                 style="
-                    font-size: 17px;
+                    margin: 0 0 5px 0;
+
+                    font-size: 16px;
                     font-weight: bold;
-                    margin-bottom: 5px;
                 "
             >
                 PRODUCTIVITY IS NOT A CHOICE.
                 PRODUCTIVITY IS A DUTY.
             </p>
 
-            <p class="small">
+            <p
+                style="
+                    margin: 0;
+
+                    font-size: 10px;
+                    letter-spacing: 1px;
+
+                    opacity: 0.7;
+                "
+            >
                 OFFICIAL CITIZEN CONTRIBUTION REGISTER
             </p>
+
         </div>
 
 
@@ -2394,8 +2484,11 @@ function renderAdminRankings(
         <div
             style="
                 display: flex;
+
                 gap: 15px;
+
                 margin-bottom: 25px;
+
                 align-items: stretch;
             "
         >
@@ -2430,9 +2523,12 @@ function renderAdminRankings(
         <div
             style="
                 display: grid;
+
                 grid-template-columns:
                     repeat(3, minmax(0, 1fr));
+
                 gap: 15px;
+
                 margin-bottom: 25px;
             "
         >
@@ -2441,21 +2537,24 @@ function renderAdminRankings(
                 "HIGHLY CONTRIBUTIVE",
                 "TOP 9 CITIZENS",
                 topNine,
-                1
+                1,
+                "top"
             )}
 
             ${rankingColumnHTML(
                 "ADEQUATELY CONTRIBUTIVE",
                 "MIDDLE 10 CITIZENS",
                 middleTen,
-                10
+                10,
+                "middle"
             )}
 
             ${rankingColumnHTML(
                 "REQUIRING IMPROVEMENT",
                 "WORST 8 CITIZENS",
                 worstEight,
-                20
+                20,
+                "bottom"
             )}
 
         </div>
@@ -2468,6 +2567,9 @@ function renderAdminRankings(
             style="
                 text-align: center;
                 margin-top: 10px;
+
+                border-top:
+                    4px solid #951111;
             "
         >
 
@@ -2491,7 +2593,11 @@ function renderAdminRankings(
 
             <p
                 class="small"
-                style="margin-top: 15px;"
+                style="
+                    margin-top: 15px;
+                    color: #951111;
+                    font-weight: bold;
+                "
             >
                 THIS REGISTER IS PROPERTY OF
                 THE CITIZENSHIP AUTHORITY.
@@ -2513,7 +2619,6 @@ function renderAdminRankings(
         .onclick = () =>
             showAdmin(password);
 }
-
 /* ============================================================
    ADJUSTMENT FORM - Form to set target distribution
 ============================================================ */
