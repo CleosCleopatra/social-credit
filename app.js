@@ -2046,68 +2046,306 @@ function renderAdminRankings(
     people,
     password
 ) {
-
-    // Make a copy so we do not change the original
-    // people array.
     const sortedPeople = [...people].sort(
         (a, b) =>
             Number(b.score) - Number(a.score)
     );
 
+    /*
+       These citizens are excluded from the
+       three detailed ranking columns.
+    */
+    const excludedNames = new Set([
+        "Adrian Wireklint",
+        "Emanuel Aspman",
+        "Erik Arvidsson",
+        "Rickard Lennernäs",
+        "Lina Rybeck",
+        "Love Suneson",
+        "Felix Ferin",
+        "Xenia Lööf"
+    ]);
 
-    // Get the three highest scoring citizens.
+    /*
+       TOP / BOTTOM THREE
+    */
     const topThree =
         sortedPeople.slice(0, 3);
 
-
-    // Get the three lowest scoring citizens.
     const bottomThree =
         sortedPeople
             .slice(-3)
             .reverse();
 
 
-    // Create the HTML for one citizen.
-    function citizenHTML(
+    /*
+       PEOPLE USED IN THE THREE COLUMNS.
+
+       The eight excluded citizens are removed,
+       but everyone else remains.
+    */
+    const columnPeople =
+        sortedPeople.filter(person =>
+            !excludedNames.has(
+                person.name
+            )
+        );
+
+
+    /*
+       Three ranking groups:
+       - Top 9
+       - Middle 10
+       - Worst 8
+    */
+    const topNine =
+        columnPeople.slice(0, 9);
+
+    const middleTen =
+        columnPeople.slice(9, 19);
+
+    const worstEight =
+        columnPeople.slice(19, 27);
+
+
+    /*
+       Small ranking entry.
+    */
+    function rankingPersonHTML(
         person,
-        position
+        rank
+    ) {
+        return `
+            <div
+                class="ranking-person"
+                style="
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    gap: 10px;
+                    padding: 10px 12px;
+                    border-bottom: 1px solid #ddd;
+                    background: #fff;
+                "
+            >
+                <div
+                    style="
+                        display: flex;
+                        align-items: center;
+                        gap: 10px;
+                        min-width: 0;
+                    "
+                >
+                    <span
+                        style="
+                            font-weight: bold;
+                            width: 28px;
+                            flex-shrink: 0;
+                            color: #777;
+                        "
+                    >
+                        ${rank}
+                    </span>
+
+                    <span
+                        style="
+                            font-weight: bold;
+                            overflow: hidden;
+                            text-overflow: ellipsis;
+                            white-space: nowrap;
+                        "
+                    >
+                        ${escapeHTML(person.name)}
+                    </span>
+                </div>
+
+                <span
+                    style="
+                        font-weight: bold;
+                        white-space: nowrap;
+                        font-size: 18px;
+                    "
+                >
+                    ${escapeHTML(person.score)}
+                </span>
+            </div>
+        `;
+    }
+
+
+    /*
+       Large top/bottom citizen cards.
+    */
+    function podiumHTML(
+        person,
+        position,
+        type
+    ) {
+
+        let title = "";
+        let subtitle = "";
+
+        if (type === "top") {
+            title =
+                position === 1
+                    ? "★ #1"
+                    : `#${position}`;
+
+            subtitle =
+                position === 1
+                    ? "MOST EXEMPLARY CITIZEN"
+                    : "EXEMPLARY CITIZEN";
+
+        } else {
+            title =
+                `#${position}`;
+
+            subtitle =
+                "CITIZEN REQUIRING CORRECTION";
+        }
+
+        return `
+            <div
+                class="card"
+                style="
+                    margin: 0;
+                    text-align: center;
+                    flex: 1;
+                    min-width: 0;
+                    padding: 22px 15px;
+                    border: 2px solid #222;
+                    box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+                "
+            >
+
+                <div
+                    style="
+                        font-size: 28px;
+                        font-weight: bold;
+                        margin-bottom: 8px;
+                    "
+                >
+                    ${title}
+                </div>
+
+                <div
+                    style="
+                        font-size: 11px;
+                        letter-spacing: 1px;
+                        font-weight: bold;
+                        margin-bottom: 12px;
+                    "
+                >
+                    ${subtitle}
+                </div>
+
+                <div
+                    style="
+                        font-size: 21px;
+                        font-weight: bold;
+                        margin-bottom: 8px;
+                    "
+                >
+                    ${escapeHTML(person.name)}
+                </div>
+
+                <div
+                    style="
+                        font-size: 12px;
+                        color: #666;
+                        margin-bottom: 12px;
+                    "
+                >
+                    ${escapeHTML(person.citizenship_id)}
+                </div>
+
+                <div
+                    style="
+                        font-size: 34px;
+                        font-weight: bold;
+                    "
+                >
+                    ${escapeHTML(person.score)}
+                </div>
+
+            </div>
+        `;
+    }
+
+
+    /*
+       Ranking column.
+    */
+    function rankingColumnHTML(
+        title,
+        subtitle,
+        peopleInColumn,
+        startRank
     ) {
 
         return `
             <div
                 class="card"
                 style="
-                    margin-top: 10px;
-                    text-align: center;
+                    padding: 0;
+                    overflow: hidden;
+                    margin: 0;
                 "
             >
 
-                <h2>
-                    ${position}
-                </h2>
-
-                <p
+                <div
                     style="
-                        font-size: 22px;
-                        font-weight: bold;
+                        padding: 18px 15px;
+                        border-bottom: 3px solid #222;
+                        text-align: center;
+                        background: #f2f2f2;
                     "
                 >
-                    ${escapeHTML(person.name)}
-                </p>
+                    <h2
+                        style="
+                            margin: 0 0 5px 0;
+                            font-size: 19px;
+                        "
+                    >
+                        ${title}
+                    </h2>
 
-                <p class="small">
-                    CITIZENSHIP ID:
-                    ${escapeHTML(person.citizenship_id)}
-                </p>
+                    <div
+                        style="
+                            font-size: 11px;
+                            font-weight: bold;
+                            color: #666;
+                        "
+                    >
+                        ${subtitle}
+                    </div>
+                </div>
 
-                <p
-                    style="
-                        font-size: 32px;
-                        font-weight: bold;
-                    "
-                >
-                    ${escapeHTML(person.score)}
-                </p>
+                <div>
+                    ${
+                        peopleInColumn.length > 0
+                            ? peopleInColumn
+                                .map(
+                                    (person, index) =>
+                                        rankingPersonHTML(
+                                            person,
+                                            startRank + index
+                                        )
+                                )
+                                .join("")
+                            : `
+                                <div
+                                    style="
+                                        padding: 20px;
+                                        text-align: center;
+                                        color: #777;
+                                    "
+                                >
+                                    NO DATA
+                                </div>
+                            `
+                    }
+                </div>
 
             </div>
         `;
@@ -2116,17 +2354,29 @@ function renderAdminRankings(
 
     setContent(`
 
-        <div class="card">
+        <!-- HEADER -->
 
-            <h2>
+        <div
+            class="card"
+            style="
+                text-align: center;
+                margin-bottom: 20px;
+            "
+        >
+            <h1
+                style="
+                    margin-bottom: 8px;
+                    letter-spacing: 2px;
+                "
+            >
                 CITIZENSHIP RANKINGS
-            </h2>
+            </h1>
 
             <p
                 style="
-                    text-align: center;
-                    font-size: 18px;
+                    font-size: 17px;
                     font-weight: bold;
+                    margin-bottom: 5px;
                 "
             >
                 PRODUCTIVITY IS NOT A CHOICE.
@@ -2134,96 +2384,117 @@ function renderAdminRankings(
             </p>
 
             <p class="small">
-                The following citizens have been identified
-                as examples of appropriate and inappropriate
-                contribution to society.
+                OFFICIAL CITIZEN CONTRIBUTION REGISTER
             </p>
-
         </div>
 
 
-        <!-- ================================================= -->
-        <!-- TOP THREE -->
-        <!-- ================================================= -->
+        <!-- TOP / BOTTOM THREE -->
 
-        <div class="card">
-
-            <h2>
-                EXEMPLARY CITIZENS
-            </h2>
-
-            <p
-                style="
-                    text-align: center;
-                    font-weight: bold;
-                "
-            >
-                THEIR CONTRIBUTION STRENGTHENS THE STATE.
-            </p>
+        <div
+            style="
+                display: flex;
+                gap: 15px;
+                margin-bottom: 25px;
+                align-items: stretch;
+            "
+        >
 
             ${topThree
                 .map(
                     (person, index) =>
-                        citizenHTML(
+                        podiumHTML(
                             person,
-                            `#${index + 1}`
+                            index + 1,
+                            "top"
                         )
                 )
-                .join("")
-            }
-
-        </div>
-
-
-        <!-- ================================================= -->
-        <!-- BOTTOM THREE -->
-        <!-- ================================================= -->
-
-        <div class="card">
-
-            <h2>
-                CITIZENS REQUIRING CORRECTION
-            </h2>
-
-            <p
-                style="
-                    text-align: center;
-                    font-weight: bold;
-                "
-            >
-                IMPROVEMENT IS MANDATORY.
-            </p>
+                .join("")}
 
             ${bottomThree
                 .map(
                     (person, index) =>
-                        citizenHTML(
+                        podiumHTML(
                             person,
-                            `#${index + 1}`
+                            sortedPeople.length - index,
+                            "bottom"
                         )
                 )
-                .join("")
-            }
+                .join("")}
 
         </div>
 
 
-        <div class="card">
+        <!-- THREE RANKING COLUMNS -->
+
+        <div
+            style="
+                display: grid;
+                grid-template-columns:
+                    repeat(3, minmax(0, 1fr));
+                gap: 15px;
+                margin-bottom: 25px;
+            "
+        >
+
+            ${rankingColumnHTML(
+                "HIGHLY CONTRIBUTIVE",
+                "TOP 9 CITIZENS",
+                topNine,
+                1
+            )}
+
+            ${rankingColumnHTML(
+                "ADEQUATELY CONTRIBUTIVE",
+                "MIDDLE 10 CITIZENS",
+                middleTen,
+                10
+            )}
+
+            ${rankingColumnHTML(
+                "REQUIRING IMPROVEMENT",
+                "WORST 8 CITIZENS",
+                worstEight,
+                20
+            )}
+
+        </div>
+
+
+        <!-- FOOTER -->
+
+        <div
+            class="card"
+            style="
+                text-align: center;
+                margin-top: 10px;
+            "
+        >
 
             <p
                 style="
-                    text-align: center;
-                    font-size: 18px;
+                    font-size: 17px;
                     font-weight: bold;
+                    line-height: 1.5;
                 "
             >
                 REMEMBER:
-                <br>
-                YOUR SCORE IS A REFLECTION OF YOUR
-                CONTRIBUTION.
                 <br><br>
+
+                YOUR SCORE IS A REFLECTION
+                OF YOUR CONTRIBUTION.
+                <br><br>
+
                 YOUR CONTRIBUTION IS A REFLECTION
                 OF YOUR LOYALTY.
+            </p>
+
+            <p
+                class="small"
+                style="margin-top: 15px;"
+            >
+                THIS REGISTER IS PROPERTY OF
+                THE CITIZENSHIP AUTHORITY.
             </p>
 
             <button
@@ -2234,19 +2505,14 @@ function renderAdminRankings(
             </button>
 
         </div>
-
     `);
 
 
-    // Return to the normal admin dashboard.
     document
-        .getElementById(
-            "admin-rankings-back"
-        )
+        .getElementById("admin-rankings-back")
         .onclick = () =>
             showAdmin(password);
 }
-
 
 /* ============================================================
    ADJUSTMENT FORM - Form to set target distribution
