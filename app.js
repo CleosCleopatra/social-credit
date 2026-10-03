@@ -1354,7 +1354,7 @@ function renderAdmin(
     adjustment,
     password
 ) {
-    let selectedCustomEventPerson = null;
+    let selectedCustomEventPerson = [];
 
     // Get the distribution of people across score categories
     const distribution =
@@ -1547,7 +1547,6 @@ function renderAdmin(
     // ------------------------------------------------------------
 // CUSTOM EVENT - CITIZEN SEARCH
 // ------------------------------------------------------------
-
 const personButton =
     document.getElementById(
         "custom-event-person-button"
@@ -1566,6 +1565,146 @@ const personSearch =
 const personLinks =
     personDropdown.querySelectorAll("a");
 
+
+// ------------------------------------------------------------
+// OPEN / CLOSE DROPDOWN
+// ------------------------------------------------------------
+
+personButton.onclick = function(event) {
+
+    event.preventDefault();
+
+    personDropdown.classList.toggle("show");
+
+    personSearch.focus();
+
+};
+
+
+// ------------------------------------------------------------
+// SEARCH PEOPLE
+// ------------------------------------------------------------
+
+personSearch.onkeyup = function() {
+
+    personDropdown.classList.add("show");
+
+    const filter =
+        this.value.toUpperCase();
+
+    personLinks.forEach(link => {
+
+        const text =
+            (
+                link.textContent ||
+                link.innerText ||
+                ""
+            ).toUpperCase();
+
+        link.style.display =
+            text.includes(filter)
+                ? ""
+                : "none";
+
+    });
+
+};
+
+
+// ------------------------------------------------------------
+// PREVENT DROPDOWN FROM CLOSING WHEN SEARCHING
+// ------------------------------------------------------------
+
+personSearch.onclick = function(event) {
+
+    event.stopPropagation();
+
+    personDropdown.classList.add("show");
+
+};
+
+
+// ------------------------------------------------------------
+// SELECT / DESELECT PEOPLE
+// ------------------------------------------------------------
+
+personLinks.forEach(link => {
+
+    link.onclick = function(event) {
+
+        event.preventDefault();
+
+        const personId =
+            link.dataset.person;
+
+        const index =
+            selectedCustomEventPeople.indexOf(
+                personId
+            );
+
+
+        // ----------------------------------------------------
+        // PERSON WAS ALREADY SELECTED → DESELECT
+        // ----------------------------------------------------
+
+        if (index !== -1) {
+
+            selectedCustomEventPeople.splice(
+                index,
+                1
+            );
+
+            link.style.backgroundColor = "";
+
+        }
+
+
+        // ----------------------------------------------------
+        // PERSON WAS NOT SELECTED → SELECT
+        // ----------------------------------------------------
+
+        else {
+
+            selectedCustomEventPeople.push(
+                personId
+            );
+
+            link.style.backgroundColor =
+                "#ddd";
+
+        }
+
+
+        // ----------------------------------------------------
+        // UPDATE BUTTON TEXT
+        // ----------------------------------------------------
+
+        if (
+            selectedCustomEventPeople.length === 0
+        ) {
+
+            personButton.innerText =
+                "SELECT CITIZENS.";
+
+        }
+
+        else {
+
+            personButton.innerText =
+                selectedCustomEventPeople.length +
+                " CITIZEN" +
+                (
+                    selectedCustomEventPeople.length === 1
+                        ? ""
+                        : "S"
+                ) +
+                " SELECTED.";
+
+        }
+
+    };
+
+});
 
 // Open / close dropdown
 
@@ -1707,164 +1846,265 @@ personLinks.forEach(link => {
     // ------------------------------------------------------------
 
     document
-        .getElementById("custom-event-submit")
-        .onclick = async () => {
+    .getElementById("custom-event-submit")
+    .onclick = async () => {
 
-            const person =
-                selectedCustomEventPerson;
+    const peopleToReport =
+        selectedCustomEventPeople;
 
-            const reason =
-                document
-                    .getElementById("custom-event-reason")
-                    .value
-                    .trim();
+    const reason =
+        document
+            .getElementById(
+                "custom-event-reason"
+            )
+            .value
+            .trim();
 
-            const points =
-                Number(
-                    document
-                        .getElementById("custom-event-points")
-                        .value
-                );
-
-            const errorElement =
-                document
-                    .getElementById("custom-event-error");
-
-            const button =
-                document
-                    .getElementById("custom-event-submit");
-
-
-            // ----------------------------------------------------
-            // VALIDATION
-            // ----------------------------------------------------
-
-            if (!person) {
-
-                errorElement.innerText =
-                    "SELECT A CITIZEN.";
-
-                return;
-            }
-
-
-            if (!reason) {
-
-                errorElement.innerText =
-                    "ENTER A CLASSIFICATION.";
-
-                return;
-            }
-
-
-            if (isNaN(points)) {
-
-                errorElement.innerText =
-                    "ENTER A VALID POINT VALUE.";
-
-                return;
-            }
-
-
-            // ----------------------------------------------------
-            // CONFIRM
-            // ----------------------------------------------------
-
-            const selectedPerson =
-                people.find(
-                    p =>
-                        p.citizenship_id === person
-                );
-
-
-            if (
-                !confirm(
-                    `Issue administrative report?\n\n` +
-                    `Citizen: ${selectedPerson.name}\n` +
-                    `Classification: ${reason}\n` +
-                    `Points: ${points > 0 ? "+" : ""}${points}`
+    const points =
+        Number(
+            document
+                .getElementById(
+                    "custom-event-points"
                 )
-            ) {
-                return;
-            }
+                .value
+        );
+
+    const errorElement =
+        document
+            .getElementById(
+                "custom-event-error"
+            );
+
+    const button =
+        document
+            .getElementById(
+                "custom-event-submit"
+            );
 
 
-            // ----------------------------------------------------
-            // SEND TO SERVER
-            // ----------------------------------------------------
+    // --------------------------------------------------------
+    // VALIDATION
+    // --------------------------------------------------------
 
-            button.disabled = true;
+    if (
+        peopleToReport.length === 0
+    ) {
 
-            button.innerText =
-                "PROCESSING...";
+        errorElement.innerText =
+            "SELECT AT LEAST ONE CITIZEN.";
 
-            errorElement.innerText = "";
+        return;
 
-
-            try {
-
-                const result =
-                    await api(
-                        "add_event",
-                        {
-                            password: password,
-
-                            citizenship_id:
-                                person,
-
-                            reason:
-                                reason,
-
-                            points:
-                                points,
-
-                            reported_by:
-                                "ADMIN"
-                        }
-                    );
+    }
 
 
-                if (!result.success) {
+    if (!reason) {
 
-                    errorElement.innerText =
-                        result.error;
+        errorElement.innerText =
+            "ENTER A CLASSIFICATION.";
 
-                    return;
-                }
+        return;
+
+    }
 
 
-                // ------------------------------------------------
-                // SUCCESS
-                // ------------------------------------------------
+    if (isNaN(points)) {
 
-                alert(
-                    "ADMINISTRATIVE REPORT ISSUED.\n\n" +
-                    `${selectedPerson.name}: ` +
-                    `${result.old_score} → ` +
-                    `${result.new_score}`
+        errorElement.innerText =
+            "ENTER A VALID POINT VALUE.";
+
+        return;
+
+    }
+
+
+    // --------------------------------------------------------
+    // FIND SELECTED PEOPLE
+    // --------------------------------------------------------
+
+    const selectedPeople =
+        people.filter(person =>
+            peopleToReport.includes(
+                person.citizenship_id
+            )
+        );
+
+
+    // --------------------------------------------------------
+    // CREATE CONFIRMATION TEXT
+    // --------------------------------------------------------
+
+    const names =
+        selectedPeople
+            .map(person =>
+                "• " + person.name
+            )
+            .join("\n");
+
+
+    const confirmation =
+        "ISSUE ADMINISTRATIVE REPORTS?\n\n" +
+        "CITIZENS:\n" +
+        names +
+        "\n\n" +
+        "CLASSIFICATION: " +
+        reason +
+        "\n" +
+        "POINTS: " +
+        (
+            points > 0
+                ? "+"
+                : ""
+        ) +
+        points;
+
+
+    if (!confirm(confirmation)) {
+
+        return;
+
+    }
+
+
+    // --------------------------------------------------------
+    // START PROCESSING
+    // --------------------------------------------------------
+
+    button.disabled = true;
+
+    button.innerText =
+        "PROCESSING...";
+
+    errorElement.innerText = "";
+
+
+    try {
+
+        let successfulReports = 0;
+
+        let failedReports = [];
+
+
+        // ----------------------------------------------------
+        // REPORT EACH SELECTED PERSON
+        // ----------------------------------------------------
+
+        for (
+            const person of selectedPeople
+        ) {
+
+            const result =
+                await api(
+                    "add_event",
+                    {
+                        password: password,
+
+                        citizenship_id:
+                            person.citizenship_id,
+
+                        reason:
+                            reason,
+
+                        points:
+                            points,
+
+                        reported_by:
+                            "ADMIN"
+                    }
                 );
 
 
-                // Reload dashboard so the new score is visible
+            if (result.success) {
 
-                await showAdmin(password);
-
-
-            } catch (error) {
-
-                errorElement.innerText =
-                    error.message;
-
-            } finally {
-
-                button.disabled = false;
-
-                button.innerText =
-                    "ISSUE ADMINISTRATIVE REPORT";
+                successfulReports++;
 
             }
-        };
-}
+
+            else {
+
+                failedReports.push(
+                    person.name +
+                    ": " +
+                    result.error
+                );
+
+            }
+
+        }
+
+
+        // ----------------------------------------------------
+        // SUCCESS MESSAGE
+        // ----------------------------------------------------
+
+        if (
+            failedReports.length === 0
+        ) {
+
+            alert(
+                "ADMINISTRATIVE REPORTS ISSUED.\n\n" +
+                successfulReports +
+                " CITIZEN" +
+                (
+                    successfulReports === 1
+                        ? ""
+                        : "S"
+                ) +
+                " AFFECTED."
+            );
+
+        }
+
+        else {
+
+            alert(
+                "REPORTING COMPLETED.\n\n" +
+                successfulReports +
+                " SUCCESSFUL.\n" +
+                failedReports.length +
+                " FAILED.\n\n" +
+                failedReports.join("\n")
+            );
+
+        }
+
+
+        // ----------------------------------------------------
+        // RESET SELECTION
+        // ----------------------------------------------------
+
+        selectedCustomEventPeople = [];
+
+
+        // ----------------------------------------------------
+        // RELOAD ADMIN DASHBOARD
+        // ----------------------------------------------------
+
+        button.disabled = false;
+
+        button.innerText =
+            "ISSUE ADMINISTRATIVE REPORT";
+
+        showAdmin(password);
+
+    }
+
+
+    catch (error) {
+
+        console.error(error);
+
+        errorElement.innerText =
+            "AN ERROR OCCURRED.";
+
+        button.disabled = false;
+
+        button.innerText =
+            "ISSUE ADMINISTRATIVE REPORT";
+
+    }
+
+};
 
 
 // ============================================================
